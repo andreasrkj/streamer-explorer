@@ -52,7 +52,7 @@ with col1:
     if isink is not None and iout is not None:
         img_path = os.path.join("./convergence_plots", "sink{:>03}".format(isink), "o{:>04}.png".format(iout))
         with st.spinner("Loading image..."):
-            st.image(img_path, caption="Please note the error in the legend. Top line should be $1 \\times 10^6$")
+            st.image(img_path, caption="WARNING: Please note the error in the legend. Top line should be $1 \\times 10^6$")
 
 with col2:
     if isink is not None and iout is not None:
