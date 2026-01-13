@@ -164,5 +164,5 @@ with col2:
                 with img_col:
                     if st.session_state.moment is not None and st.session_state.viewpoint is not None and st.session_state.molecule is not None:
                         st.write(f"Showing view: {viewpoint} for molecular transition {molecule} in {moment}")
-                        if iout in unconverged_sinkdict[str(isink)]:
-                            st.warning("This snapshot is unconverged.")
+                if iout in unconverged_sinkdict[str(isink)]:
+                    st.warning("This snapshot is unconverged.")
