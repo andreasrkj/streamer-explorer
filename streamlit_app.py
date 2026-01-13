@@ -111,7 +111,7 @@ with col2:
         with header_col:
             st.header("Snapshot {:>04}".format(iout))
         with selection_col:
-            page = st.pills("Select view", ["Snapshot Data", "Convergence", "Column Density", "Temperature", "Images"], selection_mode="single", default=st.session_state.page, key="page_pills")
+            page = st.pills("Select data tab", ["Snapshot Data", "Convergence", "Column Density", "Temperature", "Images"], selection_mode="single", default=st.session_state.page, key="page_pills")
             st.session_state.page = page
 
         if selection_col is not None:
