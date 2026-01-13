@@ -135,6 +135,8 @@ with col2:
                     "Accretion Rate [Msun/kyr]": f"{selected_row['Accretion Rate']:.4f}"
                 }
                 st.dataframe(pd.DataFrame([data]).T, width="stretch")
+                if iout in unconverged_sinkdict[str(isink)]:
+                    st.warning("This snapshot is unconverged.")
             elif page == "Convergence":   
                 img_path = os.path.join("./convergence_plots", "sink{:>03}".format(isink), "o{:>04}.png".format(iout))
                 st.image(img_path, caption="WARNING: Please note the error in the legend. Top line should be $1 \\times 10^6$")
@@ -142,8 +144,12 @@ with col2:
                     st.warning("This snapshot is unconverged.")
             elif page == "Column Density":
                 st.write("Column density plots would be shown here.")
+                if iout in unconverged_sinkdict[str(isink)]:
+                    st.warning("This snapshot is unconverged.")
             elif page == "Temperature":
                 st.write("Temperature plots would be shown here.")
+                if iout in unconverged_sinkdict[str(isink)]:
+                    st.warning("This snapshot is unconverged.")
             elif page == "Images":
                 option_col, img_col = st.columns(2)
                 with option_col:
@@ -158,3 +164,5 @@ with col2:
                 with img_col:
                     if st.session_state.moment is not None and st.session_state.viewpoint is not None and st.session_state.molecule is not None:
                         st.write(f"Showing view: {viewpoint} for molecular transition {molecule} in {moment}")
+                        if iout in unconverged_sinkdict[str(isink)]:
+                            st.warning("This snapshot is unconverged.")
