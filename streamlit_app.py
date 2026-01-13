@@ -16,6 +16,18 @@ sink_dict = {
     "225": (450,1330)
 }
 
+unconverged_sinkdict = {
+    "6"  : [],
+    "13" : [2210,2220,2230,2240,2250,2260,2270,2280,2290,2300,2310,2320,2330,2430,2440,2450,2460,2470,2480,2490,2500,2510,2520,2530,2540,2550,2560,2570,2580,2590,2600],
+    "24" : [390,400,410,420,430,440,450,460,470,480,490,1010],
+    "82" : [1140,1150,1160,1170,1180,1240,1260,1270,1290],
+    "122": [],
+    "162": [],
+    "180": [],
+    "225": []
+}
+
+
 st.title("Streamer data")
 
 if "display_iout_options" not in st.session_state:
@@ -126,6 +138,8 @@ with col2:
             elif page == "Convergence":   
                 img_path = os.path.join("./convergence_plots", "sink{:>03}".format(isink), "o{:>04}.png".format(iout))
                 st.image(img_path, caption="WARNING: Please note the error in the legend. Top line should be $1 \\times 10^6$")
+                if iout in unconverged_sinkdict[str(isink)]:
+                    st.warning("This snapshot is unconverged.")
             elif page == "Column Density":
                 st.write("Column density plots would be shown here.")
             elif page == "Temperature":
