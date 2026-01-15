@@ -27,6 +27,17 @@ unconverged_sinkdict = {
     "225": []
 }
 
+coldens_names = {
+    "Face On": "coldens-face-on-res1000-width5000-dz5000.png",
+    "Edge On (A)": "coldens-edge-on-A-res1000-width5000-dz5000.png",
+    "Edge On (B)": "coldens-edge-on-B-res1000-width5000-dz5000.png"
+}
+
+temp_names = {
+    "Face On": "temperature-face-on-res1000-width5000-dz5000.png",
+    "Edge On (A)": "temperature-edge-on-A-res1000-width5000-dz5000.png",
+    "Edge On (B)": "temperature-edge-on-B-res1000-width5000-dz5000.png"
+}
 
 st.title("Streamer data")
 
@@ -143,11 +154,23 @@ with col2:
                 if iout in unconverged_sinkdict[str(isink)]:
                     st.warning("This snapshot is unconverged.")
             elif page == "Column Density":
-                st.write("Column density plots would be shown here.")
+                viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint)
+                st.session_state.viewpoint = viewpoint
+                if st.session_state.viewpoint is not None:
+                    try:
+                        st.image("./column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+coldens_names[st.session_state.viewpoint])
+                    except: 
+                        st.error("Column density image not found for this snapshot and viewpoint.")
                 if iout in unconverged_sinkdict[str(isink)]:
                     st.warning("This snapshot is unconverged.")
             elif page == "Temperature":
-                st.write("Temperature plots would be shown here.")
+                viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint)
+                st.session_state.viewpoint = viewpoint
+                if st.session_state.viewpoint is not None:
+                    try:
+                        st.image("./temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+temp_names[st.session_state.viewpoint])
+                    except:
+                        st.error("Temperature image not found for this snapshot and viewpoint.")
                 if iout in unconverged_sinkdict[str(isink)]:
                     st.warning("This snapshot is unconverged.")
             elif page == "Images":
