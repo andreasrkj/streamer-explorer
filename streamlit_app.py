@@ -141,8 +141,6 @@ with col1:
         stats_df = pd.DataFrame.from_dict(sink_stats, orient='index', columns=["Completion Percentage"])
         st.bar_chart(stats_df, y="Completion Percentage", horizontal=True)
 
-
-
 with col2:
     if isink is not None and iout is not None:
         header_col, selection_col = st.columns(2)
