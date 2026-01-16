@@ -76,6 +76,25 @@ with col1:
         (nstart, nend) = sink_dict[str(isink)]
         snapshots = np.arange(nstart, nend+1, 10)
         st.session_state.display_iout_options = False
+
+        # Snapshot step controls
+        prev_col, next_col = st.columns(2)
+        with prev_col:
+            if st.button("Previous snapshot", use_container_width=True):
+                if len(snapshots) > 0:
+                    if st.session_state.selected_point is None:
+                        st.session_state.selected_point = len(snapshots) - 1
+                    else:
+                        st.session_state.selected_point = (st.session_state.selected_point - 1) % len(snapshots)
+                    st.rerun()
+        with next_col:
+            if st.button("Next snapshot", use_container_width=True):
+                if len(snapshots) > 0:
+                    if st.session_state.selected_point is None:
+                        st.session_state.selected_point = 0
+                    else:
+                        st.session_state.selected_point = (st.session_state.selected_point + 1) % len(snapshots)
+                    st.rerun()
         
         # Set iout based on selected point
         if st.session_state.selected_point is not None:
