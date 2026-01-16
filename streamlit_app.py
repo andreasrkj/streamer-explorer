@@ -132,11 +132,11 @@ with col1:
     
         # Create graph showing how much is finished of column densities, temperatures, images, etc.
         sink_stats = {
-            "Dust Temperature Calculation": len(os.listdir("./convergence_plots/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
-            "Column Density Images": len(os.listdir("./column_densities/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
-            "Temperature Images": len(os.listdir("./temperatures/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
-            "RADMC-3D Images": 0, #len(os.listdir("./molecular_imgs/radmc/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
-            "CASA simalma Images": 0, #len(os.listdir("./molecular_imgs/casa/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100
+            "Convergence": len(os.listdir("./convergence_plots/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
+            "Column Density": len(os.listdir("./column_densities/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
+            "Temperature": len(os.listdir("./temperatures/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
+            "RADMC-3D Imgs": 0, #len(os.listdir("./molecular_imgs/radmc/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
+            "SimALMA Imgs": 0, #len(os.listdir("./molecular_imgs/casa/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100
         }
         stats_df = pd.DataFrame.from_dict(sink_stats, orient='index', columns=["Completion Percentage"])
         st.bar_chart(stats_df, y="Completion Percentage", x_label="Percentage of snapshots completed", horizontal=True)
