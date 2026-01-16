@@ -201,7 +201,7 @@ with col2:
                             # Generate the name using the session state variables
                             img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
                                 st.session_state.moment.split()[-1],
-                                st.session_state.molecule.replace("$^{13}$CO", "13co").replace("C$^{18}$O", "c18o").replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$"),
+                                st.session_state.molecule.replace("$^{13}$CO", "13co").replace("C$^{18}$O", "c18o").replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "h2co"),
                                 view_keys[st.session_state.viewpoint]
                             )
                             try:
@@ -213,7 +213,7 @@ with col2:
                             # Generate the name using the session state variables
                             img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
                                 st.session_state.moment.split()[-1],
-                                st.session_state.molecule.replace("$^{13}$CO", "13co").replace("C$^{18}$O", "c18o").replace("H$_2$CO", "h2co"),
+                                st.session_state.molecule.replace("$^{13}$CO", "13co").replace("C$^{18}$O", "c18o").replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "h2co"),
                                 view_keys[st.session_state.viewpoint]
                             )
                             try:
