@@ -139,7 +139,7 @@ with col1:
             "CASA simalma Images": 0, #len(os.listdir("./molecular_imgs/casa/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100
         }
         stats_df = pd.DataFrame.from_dict(sink_stats, orient='index', columns=["Completion Percentage"])
-        st.bar_chart(stats_df, y="Completion Percentage", horizontal=True)
+        st.bar_chart(stats_df, y="Completion Percentage", y_label="Percentage of snapshots completed", horizontal=True)
 
 with col2:
     if isink is not None and iout is not None:
