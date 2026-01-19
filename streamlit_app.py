@@ -161,7 +161,7 @@ with col2:
         with header_col:
             st.header("Snapshot {:>04}".format(iout))
         with selection_col:
-            page = st.pills("Select data tab", ["Snapshot Data", "Convergence", "Column Density", "Temperature", "Images"], selection_mode="single", default=st.session_state.page, key="page_pills")
+            page = st.pills("Select data tab", ["Snapshot Data", "Convergence", "Column Density", "Temperature", "Images"], selection_mode="single", default=st.session_state.page, key="page_pills", width="stretch")
             st.session_state.page = page
 
         if selection_col is not None:
@@ -173,49 +173,43 @@ with col2:
                     "Accretion Rate [Msun/kyr]": f"{selected_row['Accretion Rate']:.4f}"
                 }
                 st.dataframe(pd.DataFrame([data]).T, width="stretch")
-                if iout in unconverged_sinkdict[str(isink)]:
-                    st.warning("This snapshot is unconverged.")
+
             elif page == "Convergence":   
                 img_path = os.path.join("./convergence_plots", "sink{:>03}".format(isink), "o{:>04}.png".format(iout))
                 st.image(img_path, caption="WARNING: Please note the error in the legend. Top line should be $1 \\times 10^6$")
-                if iout in unconverged_sinkdict[str(isink)]:
-                    st.warning("This snapshot is unconverged.")
-            elif page == "Column Density":
-                viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint)
-                st.session_state.viewpoint = viewpoint
-                if st.session_state.viewpoint is not None:
-                    try:
-                        st.image("./column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(view_keys[st.session_state.viewpoint]))
-                    except: 
-                        st.error("Column density image not found for this snapshot and viewpoint.")
-                if iout in unconverged_sinkdict[str(isink)]:
-                    st.warning("This snapshot is unconverged.")
-            elif page == "Temperature":
-                viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint)
-                st.session_state.viewpoint = viewpoint
-                if st.session_state.viewpoint is not None:
-                    try:
-                        st.image("./temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(view_keys[st.session_state.viewpoint]))
-                    except:
-                        st.error("Temperature image not found for this snapshot and viewpoint.")
-                if iout in unconverged_sinkdict[str(isink)]:
-                    st.warning("This snapshot is unconverged.")
-            elif page == "Images":
+
+            elif page in ["Column Density", "Temperature", "Images"]:
                 option_col, img_col = st.columns(2)
+
                 with option_col:
-                    viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint, key="viewpoint_pills")
+                    viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint, key="viewpoint_pills", width="stretch")
                     st.session_state.viewpoint = viewpoint
-                    if st.session_state.viewpoint is not None:
-                        molecule = st.pills("Molecular Transition", ["H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "$^{13}$CO J = 2-1", "C$^{18}$O J = 2-1"], selection_mode="single", default=st.session_state.molecule, key="molecule_pills")
+                    if page == "Images" and st.session_state.viewpoint is not None:
+                        molecule = st.pills("Molecular Transition", ["H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "$^{13}$CO J = 2-1", "C$^{18}$O J = 2-1"], selection_mode="single", default=st.session_state.molecule, 
+                                            key="molecule_pills", width="stretch")
                         st.session_state.molecule = molecule
-                    if st.session_state.molecule is not None and st.session_state.viewpoint is not None:
-                        moment = st.pills("Select moment to view", ["Moment 0", "Moment 1", "Moment 8", "Moment 9"], selection_mode="single", default=st.session_state.moment, key="moment_pills")
+                    if page == "Images" and st.session_state.molecule is not None and st.session_state.viewpoint is not None:
+                        moment = st.pills("Select moment to view", ["Moment 0", "Moment 1", "Moment 8", "Moment 9"], selection_mode="single", default=st.session_state.moment, key="moment_pills", width="stretch")
                         st.session_state.moment = moment
-                with img_col:
-                    if st.session_state.moment is not None and st.session_state.viewpoint is not None and st.session_state.molecule is not None:
+                    if page == "Images" and st.session_state.molecule is not None and st.session_state.viewpoint is not None and st.session_state.moment is not None:
                         img_type = st.pills("Choose image type", ["Image generated by RADMC-3D", "Image run through CASA simalma"], selection_mode="single", default=st.session_state.image_type, 
                                             key="image_type_pills", width="stretch")
                         st.session_state.image_type = img_type
+
+                with img_col:
+                    if page == "Column Density":
+                        if st.session_state.viewpoint is not None:
+                            try:
+                                st.image("./column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(view_keys[st.session_state.viewpoint]))
+                            except: 
+                                st.error("Column density image not found for this snapshot and viewpoint.")
+                    elif page == "Temperature":
+                        if st.session_state.viewpoint is not None:
+                            try:
+                                st.image("./temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(view_keys[st.session_state.viewpoint]))
+                            except:
+                                st.error("Temperature image not found for this snapshot and viewpoint.")
+                    elif page == "Images":
                         if st.session_state.image_type == "Image generated by RADMC-3D":
                             # Generate the name using the session state variables
                             img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
@@ -239,5 +233,6 @@ with col2:
                                 st.image("./images/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
                             except:
                                 st.error("CASA simalma image not found for this snapshot and viewpoint.")
-                if iout in unconverged_sinkdict[str(isink)]:
-                    st.warning("This snapshot is unconverged.")
+                        
+            if iout in unconverged_sinkdict[str(isink)]:
+                st.warning("This snapshot is unconverged.")
