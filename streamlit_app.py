@@ -149,7 +149,7 @@ with col1:
             "Convergence": len(os.listdir("./convergence_plots/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
             "Column Density": len(os.listdir("./column_densities/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
             "Temperature": len(os.listdir("./temperatures/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
-            "RADMC-3D Imgs": 0, #len(os.listdir("./molecular_imgs/radmc/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
+            "RADMC-3D Imgs": len(os.listdir("./molecular_imgs/radmc/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
             "SimALMA Imgs": 0, #len(os.listdir("./molecular_imgs/casa/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100
         }
         stats_df = pd.DataFrame.from_dict(sink_stats, orient='index', columns=["Completion Percentage"])
@@ -218,7 +218,7 @@ with col2:
                                 view_keys[st.session_state.viewpoint]
                             )
                             try:
-                                st.image("./images/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
+                                st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
                             except:
                                 st.error("RADMC-3D image not found for this snapshot and viewpoint.")
 
@@ -230,9 +230,9 @@ with col2:
                                 view_keys[st.session_state.viewpoint]
                             )
                             try:
-                                st.image("./images/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
+                                st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
                             except:
                                 st.error("CASA simalma image not found for this snapshot and viewpoint.")
                         
             if iout in unconverged_sinkdict[str(isink)]:
-                st.warning("This snapshot is unconverged.")
+                st.warning("This snapshot's dust temperature distribution is unconverged.")
