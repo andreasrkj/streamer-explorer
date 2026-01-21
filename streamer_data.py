@@ -141,16 +141,41 @@ with col1:
                     st.session_state.selected_point = new_point
                     st.rerun()
     
-        # Create graph showing how much is finished of column densities, temperatures, images, etc.
-        sink_stats = {
-            "Convergence": len(os.listdir("./convergence_plots/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
-            "Column Density": len(os.listdir("./column_densities/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
-            "Temperature": len(os.listdir("./temperatures/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
-            "RADMC-3D Imgs": len(os.listdir("./molecular_imgs/radmc/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100,
-            "SimALMA Imgs": 0, #len(os.listdir("./molecular_imgs/casa/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100
-        }
-        stats_df = pd.DataFrame.from_dict(sink_stats, orient='index', columns=["Completion Percentage"])
-        st.bar_chart(stats_df, y="Completion Percentage", x_label="Percentage of snapshots completed", horizontal=True)
+        # Create graph showing data for bolometric temperature
+        if os.path.exists("tbol_data/sink{:>03}.csv".format(int(isink))):
+            df_tbol = pd.read_csv("tbol_data/sink{:>03}.csv".format(int(isink)), names=["Sink Age", "Face On", "Edge On (A)", "Edge On (B)"], header=1)
+            fig3 = px.line(df_tbol, x="Sink Age", y=df_tbol.columns[1:], labels={'Sink Age': 'Sink Age [kyr]'})
+            fig3.update_layout(clickmode='select', overwrite=True, hovermode="x unified", yaxis_title="Bolometric Temperature [K]", hoverlabel=dict(align="left"),
+                                xaxis=dict(showspikes=True,spikemode="across",spikethickness=1,spikecolor="#888"))
+            snap_array = np.full(len(df_tbol), np.nan)
+            snap_fill = min(len(snapshots), len(df_tbol))
+            snap_array[:snap_fill] = snapshots[:snap_fill]
+
+            hoverdata = np.column_stack((snap_array,df_tbol["Sink Age"],df_tbol["Face On"],df_tbol["Edge On (A)"],df_tbol["Edge On (B)"]))
+
+            fig3.update_traces(customdata=hoverdata,mode="lines+markers",hoverinfo="skip",hovertemplate=None)
+
+            unified_hover = "<b>Snapshot %{customdata[0]:04d}</b><br>" \
+                             "Sink Age: %{customdata[1]:.2f} kyr<br>" \
+                             "Face On: %{customdata[2]:.2f} K<br>" \
+                             "Edge On (A): %{customdata[3]:.2f} K<br>" \
+                             "Edge On (B): %{customdata[4]:.2f} K<extra></extra>"
+
+            fig3.add_scatter(x=df_tbol["Sink Age"],y=df_tbol["Face On"],customdata=hoverdata,mode="markers",marker=dict(size=12, color="rgba(0,0,0,0)"),
+                             hovertemplate=unified_hover,hoverinfo="text",showlegend=False)
+            
+            # Add selected points if any
+            if st.session_state.selected_point is not None:
+                fig3.update_traces(selectedpoints=[st.session_state.selected_point])
+            
+            event3 = st.plotly_chart(fig3, key="chart3", on_select="rerun")
+
+            # Update session state if a point was selected in chart3
+            if event3.selection.points:
+                new_point = event3.selection.point_indices[0]
+                if st.session_state.selected_point != new_point:
+                    st.session_state.selected_point = new_point
+                    st.rerun()
 
 with col2:
     if isink is not None and iout is not None:
