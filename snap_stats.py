@@ -91,20 +91,30 @@ def _display_missing_files(title, missing_data, snapshots=None):
                 list_items.append(f"{label}: {formatted}")
         st.markdown("\n".join([f"- {item}" for item in list_items]))
 
-def _count_total_files(folder, snapshots):
+def _count_total_files(folder, snapshots, has_subfolders=True):
     """Count total image files across all snapshots and orientations."""
     total = 0
-    orientations = ["face-on", "edge-on-A", "edge-on-B"]
     
-    for iout in snapshots:
-        snap_folder = os.path.join(folder, f"nout{int(iout):04d}/")
+    if not has_subfolders:
+        # For convergence plots - files are directly in the folder
         try:
-            files = os.listdir(snap_folder)
-            for orientation in orientations:
-                if any(orientation in fname for fname in files):
-                    total += 1
+            files = os.listdir(folder)
+            total = len(files)
         except FileNotFoundError:
             pass
+    else:
+        # For other types - files are in nout subfolders with orientations
+        orientations = ["face-on", "edge-on-A", "edge-on-B"]
+        
+        for iout in snapshots:
+            snap_folder = os.path.join(folder, f"nout{int(iout):04d}/")
+            try:
+                files = os.listdir(snap_folder)
+                for orientation in orientations:
+                    # Count all files matching this orientation
+                    total += sum(1 for fname in files if orientation in fname)
+            except FileNotFoundError:
+                pass
     
     return total
 
@@ -125,7 +135,7 @@ def completion_plot(sink_id):
     
     # Different expected totals: 3 per snapshot for most, 36 for RADMC/SimALMA
     expected_per_snapshot = {
-        "Convergence": 3,
+        "Convergence": 1,
         "Column Density": 3,
         "Temperature": 3,
         "RADMC-3D Imgs": 36,
@@ -134,7 +144,8 @@ def completion_plot(sink_id):
     
     sink_stats = {}
     for name, folder in folders.items():
-        total_files = _count_total_files(folder, snapshots)
+        has_subfolders = name != "Convergence"
+        total_files = _count_total_files(folder, snapshots, has_subfolders)
         expected_total = num_snapshots * expected_per_snapshot[name]
         sink_stats[name] = (total_files / expected_total) * 100
     
