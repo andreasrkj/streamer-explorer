@@ -91,13 +91,30 @@ def _display_missing_files(title, missing_data, snapshots=None):
                 list_items.append(f"{label}: {formatted}")
         st.markdown("\n".join([f"- {item}" for item in list_items]))
 
+def _count_total_files(folder, snapshots):
+    """Count total image files across all snapshots and orientations."""
+    total = 0
+    orientations = ["face-on", "edge-on-A", "edge-on-B"]
+    
+    for iout in snapshots:
+        snap_folder = os.path.join(folder, f"nout{int(iout):04d}/")
+        try:
+            files = os.listdir(snap_folder)
+            for orientation in orientations:
+                if any(orientation in fname for fname in files):
+                    total += 1
+        except FileNotFoundError:
+            pass
+    
+    return total
+
 def completion_plot(sink_id):
     (nstart, nend) = sink_dict[str(sink_id)]
     snapshots = np.arange(nstart, nend+1, 10)
     num_snapshots = len(snapshots)
     sink_path = f"sink{int(sink_id):>03}"
 
-    # Calculate completion statistics
+    # Calculate completion statistics based on total image count
     folders = {
         "Convergence": f"./convergence_plots/{sink_path}/",
         "Column Density": f"./column_densities/{sink_path}/",
@@ -106,9 +123,20 @@ def completion_plot(sink_id):
         "SimALMA Imgs": f"./molecular_imgs/casa/{sink_path}/",
     }
     
-    sink_stats = {name: len(os.listdir(folder)) / num_snapshots * 100 
-                  for name, folder in folders.items() if name != "SimALMA Imgs"}
-    sink_stats["SimALMA Imgs"] = 0
+    # Different expected totals: 3 per snapshot for most, 36 for RADMC/SimALMA
+    expected_per_snapshot = {
+        "Convergence": 3,
+        "Column Density": 3,
+        "Temperature": 3,
+        "RADMC-3D Imgs": 36,
+        "SimALMA Imgs": 36,
+    }
+    
+    sink_stats = {}
+    for name, folder in folders.items():
+        total_files = _count_total_files(folder, snapshots)
+        expected_total = num_snapshots * expected_per_snapshot[name]
+        sink_stats[name] = (total_files / expected_total) * 100
     
     stats_df = pd.DataFrame.from_dict(sink_stats, orient='index', columns=["Completion Percentage"])
     st.bar_chart(stats_df, y="Completion Percentage", y_label="Percentage of snapshots completed")
