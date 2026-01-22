@@ -106,6 +106,9 @@ def completion_plot(sink_id):
 
 
 def convergence(sink_id):
+    (nstart, nend) = sink_dict[str(sink_id)]
+    snapshots = np.arange(nstart, nend+1, 10)
+    
     df = pd.read_csv("sink_histories/sink{:>03}_history.dat".format(int(sink_id)), names=["Sink Age", "Mass", "Accretion Rate"], header=1)
     df["Sink Age"] /= 1.0e3  # Convert to kyr
     df["Accretion Rate"] *= 1.0e3  # Convert to Msun/kyr
