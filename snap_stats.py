@@ -80,14 +80,16 @@ def _format_missing_range(missing_list, snapshots):
     return missing_list
 
 def _display_missing_files(title, missing_data, snapshots=None):
-    """Display missing files in a formatted way."""
+    """Display missing files in a compact list format."""
     if any(len(missing) > 0 for missing in missing_data):
         st.markdown(f"**{title}:**")
         labels = ["Face-On", "Edge-On (A)", "Edge-On (B)"]
+        list_items = []
         for i, label in enumerate(labels):
             if len(missing_data[i]) > 0:
                 formatted = _format_missing_range(missing_data[i], snapshots) if snapshots is not None else missing_data[i]
-                st.markdown(f"**{label}:** {formatted}")
+                list_items.append(f"{label}: {formatted}")
+        st.markdown("\n".join([f"- {item}" for item in list_items]))
 
 def completion_plot(sink_id):
     (nstart, nend) = sink_dict[str(sink_id)]
