@@ -57,7 +57,7 @@ def _get_missing_files(sink_id, folder="./temperatures/"):
             missing_files[0].append(int(iout))
             missing_files[1].append(int(iout))
             missing_files[2].append(int(iout))
-    
+
     return missing_files
 
 def basic_stats(sink_id):
@@ -68,47 +68,66 @@ def basic_stats(sink_id):
     st.markdown(f"**Snapshot Range:** {snap_min} - {snap_max}")
     st.markdown(f"**Total Snapshots:** {total_snaps}")
 
+def _format_missing_range(missing_list, snapshots):
+    """Format missing file list as a string or range."""
+    if len(missing_list) == 0:
+        return None
+    if missing_list == snapshots.tolist():
+        return "All"
+    if len(missing_list) > 1:
+        if missing_list == np.arange(int(missing_list[0]), int(missing_list[-1])+1, 10).tolist():
+            return f"{missing_list[0]}-{missing_list[-1]}"
+    return missing_list
+
+def _display_missing_files(title, missing_data, snapshots=None):
+    """Display missing files in a formatted way."""
+    if any(len(missing) > 0 for missing in missing_data):
+        st.markdown(f"**{title}:**")
+        labels = ["Face-On", "Edge-On (A)", "Edge-On (B)"]
+        for i, label in enumerate(labels):
+            if len(missing_data[i]) > 0:
+                formatted = _format_missing_range(missing_data[i], snapshots) if snapshots is not None else missing_data[i]
+                st.markdown(f"**{label}:** {formatted}")
+
 def completion_plot(sink_id):
     (nstart, nend) = sink_dict[str(sink_id)]
     snapshots = np.arange(nstart, nend+1, 10)
+    num_snapshots = len(snapshots)
+    sink_path = f"sink{int(sink_id):>03}"
 
-    # Create graph showing how much is finished of column densities, temperatures, images, etc.
-    sink_stats = {
-        "Convergence": len(os.listdir("./convergence_plots/sink{:>03}/".format(int(sink_id)))) / len(np.arange(sink_dict[str(sink_id)][0], sink_dict[str(sink_id)][1]+1, 10)) * 100,
-        "Column Density": len(os.listdir("./column_densities/sink{:>03}/".format(int(sink_id)))) / len(np.arange(sink_dict[str(sink_id)][0], sink_dict[str(sink_id)][1]+1, 10)) * 100,
-        "Temperature": len(os.listdir("./temperatures/sink{:>03}/".format(int(sink_id)))) / len(np.arange(sink_dict[str(sink_id)][0], sink_dict[str(sink_id)][1]+1, 10)) * 100,
-        "RADMC-3D Imgs": len(os.listdir("./molecular_imgs/radmc/sink{:>03}/".format(int(sink_id)))) / len(np.arange(sink_dict[str(sink_id)][0], sink_dict[str(sink_id)][1]+1, 10)) * 100,
-        "SimALMA Imgs": 0, #len(os.listdir("./molecular_imgs/casa/sink{:>03}/".format(int(isink)))) / len(snapshots) * 100
+    # Calculate completion statistics
+    folders = {
+        "Convergence": f"./convergence_plots/{sink_path}/",
+        "Column Density": f"./column_densities/{sink_path}/",
+        "Temperature": f"./temperatures/{sink_path}/",
+        "RADMC-3D Imgs": f"./molecular_imgs/radmc/{sink_path}/",
+        "SimALMA Imgs": f"./molecular_imgs/casa/{sink_path}/",
     }
+    
+    sink_stats = {name: len(os.listdir(folder)) / num_snapshots * 100 
+                  for name, folder in folders.items() if name != "SimALMA Imgs"}
+    sink_stats["SimALMA Imgs"] = 0
+    
     stats_df = pd.DataFrame.from_dict(sink_stats, orient='index', columns=["Completion Percentage"])
     st.bar_chart(stats_df, y="Completion Percentage", y_label="Percentage of snapshots completed")
 
-    missing_temps   = _get_missing_files(sink_id, folder="./temperatures/")
+    # Check for missing files
+    missing_temps = _get_missing_files(sink_id, folder="./temperatures/")
     missing_coldens = _get_missing_files(sink_id, folder="./column_densities/")
-    missing_imgs    = _get_missing_files(sink_id, folder="./molecular_imgs/radmc/")
+    missing_imgs = _get_missing_files(sink_id, folder="./molecular_imgs/radmc/")
     missing_simalma = _get_missing_files(sink_id, folder="./molecular_imgs/casa/")
 
-    if len(missing_temps[0]) > 0: st.markdown(f"**Missing Face-On Temperatures:** {missing_temps[0]}")
-    if len(missing_temps[1]) > 0: st.markdown(f"**Missing Edge-On (A) Temperatures:** {missing_temps[1]}")
-    if len(missing_temps[2]) > 0: st.markdown(f"**Missing Edge-On (B) Temperatures:** {missing_temps[2]}")
-
-    if len(missing_coldens[0]) > 0: st.markdown(f"**Missing Face-On Column Densities:** {missing_coldens[0]}")
-    if len(missing_coldens[1]) > 0: st.markdown(f"**Missing Edge-On (A) Column Densities:** {missing_coldens[1]}")
-    if len(missing_coldens[2]) > 0: st.markdown(f"**Missing Edge-On (B) Column Densities:** {missing_coldens[2]}")
-
-    if len(missing_imgs[0]) > 0: st.markdown(f"**Missing Face-On RADMC-3D Images:** {missing_imgs[0]}")
-    if len(missing_imgs[1]) > 0: st.markdown(f"**Missing Edge-On (A) RADMC-3D Images:** {missing_imgs[1]}")
-    if len(missing_imgs[2]) > 0: st.markdown(f"**Missing Edge-On (B) RADMC-3D Images:** {missing_imgs[2]}")
-
-    #if len(missing_simalma[0]) > 0: st.markdown(f"**Missing Face-On SimALMA Images:** {missing_simalma[0]}")
-    #if len(missing_simalma[1]) > 0: st.markdown(f"**Missing Edge-On (A) SimALMA Images:** {missing_simalma[1]}")
-    #if len(missing_simalma[2]) > 0: st.markdown(f"**Missing Edge-On (B) SimALMA Images:** {missing_simalma[2]}")
+    # Display missing files
+    _display_missing_files("Missing Temperatures", missing_temps, snapshots)
+    _display_missing_files("Missing Column Densities", missing_coldens, snapshots)
+    _display_missing_files("Missing RADMC-3D Images", missing_imgs, snapshots)
+    _display_missing_files("Missing SimALMA Images", missing_simalma, snapshots)
 
 
 def convergence(sink_id):
     (nstart, nend) = sink_dict[str(sink_id)]
     snapshots = np.arange(nstart, nend+1, 10)
-    
+
     df = pd.read_csv("sink_histories/sink{:>03}_history.dat".format(int(sink_id)), names=["Sink Age", "Mass", "Accretion Rate"], header=1)
     df["Sink Age"] /= 1.0e3  # Convert to kyr
     df["Accretion Rate"] *= 1.0e3  # Convert to Msun/kyr
