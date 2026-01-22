@@ -145,6 +145,7 @@ with col1:
         if os.path.exists("tbol_data/sink{:>03}.csv".format(int(isink))):
             df_tbol = pd.read_csv("tbol_data/sink{:>03}.csv".format(int(isink)), names=["Sink Age", "Face On", "Edge On (A)", "Edge On (B)"], header=1)
             fig3 = px.line(df_tbol, x="Sink Age", y=df_tbol.columns[1:], labels={'Sink Age': 'Sink Age [kyr]'})
+            fig3.add_hline(y=70, line_dash="dot", line_color="grey", annotation_text="Class 0/I", annotation_position="top left")
             fig3.update_layout(clickmode='select', overwrite=True, hovermode="x unified", yaxis_title="Bolometric Temperature [K]", hoverlabel=dict(align="left"),
                                 xaxis=dict(showspikes=True,spikemode="across",spikethickness=1,spikecolor="#888"))
             snap_array = np.full(len(df_tbol), np.nan)
