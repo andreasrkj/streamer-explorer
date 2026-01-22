@@ -17,6 +17,8 @@ if "image_type" not in st.session_state:
     st.session_state.image_type = None
 if "selected_sinks" not in st.session_state:
     st.session_state.selected_sinks = None
+if "selected_stats" not in st.session_state:
+    st.session_state.selected_stats = None
 
 data_page  = st.Page("streamer_data.py", title="Streamer Data Explorer", icon=":material/search:")
 stats_page = st.Page("snap_stats.py", title="Snapshot Statistics", icon=":material/bar_chart:")

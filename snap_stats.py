@@ -38,20 +38,40 @@ total_calculation_time = { # total CPU hours
     "225": 58922.46438
 }
 
+def _get_missing_files(sink_id, folder="./temperatures/"):
+    # Now check whether any images are missing in the folder
+    missing_files = [[],[],[]] # face-on, edge-on (A), edge-on (B)
+    (nstart, nend) = sink_dict[str(sink_id)]
+    snapshots = np.arange(nstart, nend+1, 10)
+
+    for iout in snapshots:
+        try:
+            files = os.listdir(os.path.join(folder, "sink{:>03}/nout{:>04}/".format(sink_id, iout)))
+            if not any("face-on" in fname for fname in files):
+                missing_files[0].append(int(iout))
+            if not any("edge-on-A" in fname for fname in files):
+                missing_files[1].append(int(iout))
+            if not any("edge-on-B" in fname for fname in files):
+                missing_files[2].append(int(iout))
+        except FileNotFoundError:
+            missing_files[0].append(int(iout))
+            missing_files[1].append(int(iout))
+            missing_files[2].append(int(iout))
+    
+    return missing_files
+
 def basic_stats(sink_id):
     # Show snapshot range, count, unconverged count
     snap_min, snap_max = sink_dict[str(sink_id)]
-    unconverged_list = unconverged_sinkdict[str(sink_id)]
     total_snaps = len(np.arange(snap_min, snap_max+1, 10))
-    unconverged_count = len(unconverged_list)
     st.markdown(f"**Calculation Time (CPU hrs):** {np.round(total_calculation_time[str(sink_id)],2)}")
     st.markdown(f"**Snapshot Range:** {snap_min} - {snap_max}")
     st.markdown(f"**Total Snapshots:** {total_snaps}")
-    st.markdown(f"**Unconverged Snapshots:** {unconverged_count}")
-    if unconverged_count > 0:
-        st.markdown(f"**Unconverged Snapshot List:** {unconverged_list}")
 
 def completion_plot(sink_id):
+    (nstart, nend) = sink_dict[str(sink_id)]
+    snapshots = np.arange(nstart, nend+1, 10)
+
     # Create graph showing how much is finished of column densities, temperatures, images, etc.
     sink_stats = {
         "Convergence": len(os.listdir("./convergence_plots/sink{:>03}/".format(int(sink_id)))) / len(np.arange(sink_dict[str(sink_id)][0], sink_dict[str(sink_id)][1]+1, 10)) * 100,
@@ -63,10 +83,29 @@ def completion_plot(sink_id):
     stats_df = pd.DataFrame.from_dict(sink_stats, orient='index', columns=["Completion Percentage"])
     st.bar_chart(stats_df, y="Completion Percentage", y_label="Percentage of snapshots completed")
 
+    missing_temps   = _get_missing_files(sink_id, folder="./temperatures/")
+    missing_coldens = _get_missing_files(sink_id, folder="./column_densities/")
+    missing_imgs    = _get_missing_files(sink_id, folder="./molecular_imgs/radmc/")
+    missing_simalma = _get_missing_files(sink_id, folder="./molecular_imgs/casa/")
+
+    if len(missing_temps[0]) > 0: st.markdown(f"**Missing Face-On Temperatures:** {missing_temps[0]}")
+    if len(missing_temps[1]) > 0: st.markdown(f"**Missing Edge-On (A) Temperatures:** {missing_temps[1]}")
+    if len(missing_temps[2]) > 0: st.markdown(f"**Missing Edge-On (B) Temperatures:** {missing_temps[2]}")
+
+    if len(missing_coldens[0]) > 0: st.markdown(f"**Missing Face-On Column Densities:** {missing_coldens[0]}")
+    if len(missing_coldens[1]) > 0: st.markdown(f"**Missing Edge-On (A) Column Densities:** {missing_coldens[1]}")
+    if len(missing_coldens[2]) > 0: st.markdown(f"**Missing Edge-On (B) Column Densities:** {missing_coldens[2]}")
+
+    #if len(missing_imgs[0]) > 0: st.markdown(f"**Missing Face-On RADMC-3D Images:** {missing_imgs[0]}")
+    #if len(missing_imgs[1]) > 0: st.markdown(f"**Missing Edge-On (A) RADMC-3D Images:** {missing_imgs[1]}")
+    #if len(missing_imgs[2]) > 0: st.markdown(f"**Missing Edge-On (B) RADMC-3D Images:** {missing_imgs[2]}")
+
+    #if len(missing_simalma[0]) > 0: st.markdown(f"**Missing Face-On SimALMA Images:** {missing_simalma[0]}")
+    #if len(missing_simalma[1]) > 0: st.markdown(f"**Missing Edge-On (A) SimALMA Images:** {missing_simalma[1]}")
+    #if len(missing_simalma[2]) > 0: st.markdown(f"**Missing Edge-On (B) SimALMA Images:** {missing_simalma[2]}")
+
 
 def convergence(sink_id):
-    (nstart, nend) = sink_dict[str(sink_id)]
-    snapshots = np.arange(nstart, nend+1, 10)
     df = pd.read_csv("sink_histories/sink{:>03}_history.dat".format(int(sink_id)), names=["Sink Age", "Mass", "Accretion Rate"], header=1)
     df["Sink Age"] /= 1.0e3  # Convert to kyr
     df["Accretion Rate"] *= 1.0e3  # Convert to Msun/kyr
@@ -89,6 +128,12 @@ def convergence(sink_id):
     fig1.data[0].visible = False  # Hide the original line from px.line
     st.plotly_chart(fig1)
 
+    unconverged_list = unconverged_sinkdict[str(sink_id)]
+    unconverged_count = len(unconverged_list)
+    st.markdown(f"**Unconverged Snapshots:** {unconverged_count}")
+    if unconverged_count > 0:
+        st.markdown(f"**Unconverged Snapshot List:** {unconverged_list}")
+
 st.title("Investigate Snapshot Statistics")
 sink_buttons, option_buttons = st.columns(2, gap=None, width=800)
 
@@ -110,7 +155,8 @@ with sink_buttons:
     selected_sinks.sort()
 
 with option_buttons:
-    selected_stats = st.pills("Select Statistics to View", options=["Basic Stats", "Completion Plot", "Convergence"], default=["Basic Stats"], selection_mode="single")
+    selected_stats = st.pills("Select Statistics to View", options=["Basic Stats", "Completion Plot", "Convergence"], default=st.session_state.selected_stats if st.session_state.selected_stats else "Basic Stats", selection_mode="single")
+    st.session_state.selected_stats = selected_stats
 
 if selected_sinks != []:
     sink_cols = st.columns(int(len(selected_sinks)))
@@ -119,11 +165,11 @@ if selected_sinks != []:
         with icol:
             # Make header for each sink
             st.header(f"Sink {sink_id}")
-            if selected_stats == "Basic Stats":
+            if st.session_state.selected_stats == "Basic Stats":
                 basic_stats(sink_id)
-            elif selected_stats == "Completion Plot":
+            elif st.session_state.selected_stats == "Completion Plot":
                 completion_plot(sink_id)
-            elif selected_stats == "Convergence":
+            elif st.session_state.selected_stats == "Convergence":
                 convergence(sink_id)
                 if icol == sink_cols[0]:
-                    st.write("**Note:** Red segments indicate unconverged snapshots.")
+                    st.warning("**Note:** Red segments indicate unconverged snapshots.")

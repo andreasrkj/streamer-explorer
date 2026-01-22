@@ -150,7 +150,7 @@ with col1:
                                 xaxis=dict(showspikes=True,spikemode="across",spikethickness=1,spikecolor="#888"))
             snap_array = np.full(len(df_tbol), np.nan)
             snap_fill = min(len(snapshots), len(df_tbol))
-            snap_array[:snap_fill] = snapshots[:snap_fill]
+            snap_array[:snap_fill] = snapshots[:snap_fill]  
 
             hoverdata = np.column_stack((snap_array,df_tbol["Sink Age"],df_tbol["Face On"],df_tbol["Edge On (A)"],df_tbol["Edge On (B)"]))
 
