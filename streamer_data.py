@@ -189,15 +189,13 @@ with col2:
 
         if selection_col is not None:
             if page == "Snapshot Data":
-                # Ensure selected_point is valid for the current dataframe
-                if st.session_state.selected_point is not None and st.session_state.selected_point < len(df):
-                    selected_row = df.iloc[st.session_state.selected_point]
-                    data = {
-                        "Sink Age [kyr]": f"{selected_row['Sink Age']:.2f}",
-                        "Mass [Msun]": f"{selected_row['Mass']:.4f}",
-                        "Accretion Rate [Msun/kyr]": f"{selected_row['Accretion Rate']:.4f}"
-                    }
-                    st.dataframe(pd.DataFrame([data]).T, width="stretch")
+                selected_row = df.iloc[st.session_state.selected_point]
+                data = {
+                    "Sink Age [kyr]": f"{selected_row['Sink Age']:.2f}",
+                    "Mass [Msun]": f"{selected_row['Mass']:.4f}",
+                    "Accretion Rate [Msun/kyr]": f"{selected_row['Accretion Rate']:.4f}"
+                }
+                st.dataframe(pd.DataFrame([data]).T, width="stretch")
 
             elif page == "Convergence":   
                 img_path = os.path.join("./convergence_plots", "sink{:>03}".format(isink), "o{:>04}.png".format(iout))
