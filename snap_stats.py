@@ -96,9 +96,9 @@ def completion_plot(sink_id):
     if len(missing_coldens[1]) > 0: st.markdown(f"**Missing Edge-On (A) Column Densities:** {missing_coldens[1]}")
     if len(missing_coldens[2]) > 0: st.markdown(f"**Missing Edge-On (B) Column Densities:** {missing_coldens[2]}")
 
-    #if len(missing_imgs[0]) > 0: st.markdown(f"**Missing Face-On RADMC-3D Images:** {missing_imgs[0]}")
-    #if len(missing_imgs[1]) > 0: st.markdown(f"**Missing Edge-On (A) RADMC-3D Images:** {missing_imgs[1]}")
-    #if len(missing_imgs[2]) > 0: st.markdown(f"**Missing Edge-On (B) RADMC-3D Images:** {missing_imgs[2]}")
+    if len(missing_imgs[0]) > 0: st.markdown(f"**Missing Face-On RADMC-3D Images:** {missing_imgs[0]}")
+    if len(missing_imgs[1]) > 0: st.markdown(f"**Missing Edge-On (A) RADMC-3D Images:** {missing_imgs[1]}")
+    if len(missing_imgs[2]) > 0: st.markdown(f"**Missing Edge-On (B) RADMC-3D Images:** {missing_imgs[2]}")
 
     #if len(missing_simalma[0]) > 0: st.markdown(f"**Missing Face-On SimALMA Images:** {missing_simalma[0]}")
     #if len(missing_simalma[1]) > 0: st.markdown(f"**Missing Edge-On (A) SimALMA Images:** {missing_simalma[1]}")
