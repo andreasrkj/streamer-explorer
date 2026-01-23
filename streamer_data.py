@@ -255,13 +255,13 @@ with col2:
                         elif st.session_state.image_type == "Image run through CASA simalma":
                             # Generate the name using the session state variables
                             if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
-                                img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
+                                img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
                                 st.session_state.moment.split()[-1],
                                 st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
                                 view_keys[st.session_state.viewpoint]
                                 )
                             elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
+                                img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
                                 st.session_state.moment.split()[-1],
                                 st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
                                 view_keys[st.session_state.viewpoint]
