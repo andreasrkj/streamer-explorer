@@ -197,7 +197,7 @@ def convergence(sink_id):
     if unconverged_count > 0:
         st.markdown(f"**Unconverged Snapshot List:** {unconverged_list}")
 
-st.title("Investigate Snapshot Statistics")
+st.title("Investigate Snapshot Statistics", anchor=False)
 sink_buttons, option_buttons = st.columns(2, gap=None, width=800)
 
 with sink_buttons:
@@ -227,7 +227,7 @@ if selected_sinks != []:
     for icol, sink_id in zip(sink_cols, selected_sinks):
         with icol:
             # Make header for each sink
-            st.header(f"Sink {sink_id}")
+            st.header(f"Sink {sink_id}", anchor=False)
             if st.session_state.selected_stats == "Basic Stats":
                 basic_stats(sink_id)
             elif st.session_state.selected_stats == "Completion Plot":

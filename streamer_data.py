@@ -34,7 +34,7 @@ view_keys = {
 }
 
 
-st.title("Streamer data")
+st.title("Streamer data", anchor=False)
 
 if "display_iout_options" not in st.session_state:
     st.session_state.display_iout_options = True
@@ -182,7 +182,7 @@ with col2:
     if isink is not None and iout is not None:
         header_col, selection_col = st.columns(2)
         with header_col:
-            st.header("Snapshot {:>04}".format(iout))
+            st.header("Snapshot {:>04}".format(iout), anchor=False)
         with selection_col:
             page = st.pills("Select data tab", ["Snapshot Data", "Convergence", "Column Density", "Temperature", "Images"], selection_mode="single", default=st.session_state.page, key="page_pills", width="stretch")
             st.session_state.page = page
