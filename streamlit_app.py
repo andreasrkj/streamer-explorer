@@ -19,6 +19,12 @@ if "selected_sinks" not in st.session_state:
     st.session_state.selected_sinks = None
 if "selected_stats" not in st.session_state:
     st.session_state.selected_stats = None
+if "image_viewtype" not in st.session_state:
+    st.session_state.image_viewtype = "Single Image"
+if "view_comparison" not in st.session_state:
+    st.session_state.view_comparison = None
+if "multi_moments" not in st.session_state:
+    st.session_state.multi_moments = ["Moment 8", "Moment 9"]
 
 data_page  = st.Page("streamer_data.py", title="Streamer Data Explorer", icon=":material/search:")
 stats_page = st.Page("snap_stats.py", title="Snapshot Statistics", icon=":material/bar_chart:")
