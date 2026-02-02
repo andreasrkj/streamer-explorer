@@ -99,7 +99,7 @@ with col1:
         else:
             iout = None
 
-        df = pd.read_csv("sink_histories/sink{:>03}_history.dat".format(int(isink)), names=["Sink Age", "Mass", "Accretion Rate"], header=1)
+        df = pd.read_csv("sink_histories/sink{:>03}_history.dat".format(int(isink)), names=["Sink Age", "Mass", "Accretion Rate"], header=0)
         df["Sink Age"] /= 1.0e3  # Convert to kyr
         df["Accretion Rate"] *= 1.0e3  # Convert to Msun/kyr
 
@@ -195,10 +195,14 @@ with col2:
         if selection_col is not None:
             if page == "Snapshot Data":
                 selected_row = df.iloc[st.session_state.selected_point]
+                selected_tbol = df_tbol.iloc[st.session_state.selected_point]
                 data = {
                     "Sink Age [kyr]": f"{selected_row['Sink Age']:.2f}",
                     "Mass [Msun]": f"{selected_row['Mass']:.4f}",
-                    "Accretion Rate [Msun/kyr]": f"{selected_row['Accretion Rate']:.4f}"
+                    "Accretion Rate [Msun/kyr]": f"{selected_row['Accretion Rate']:.4f}",
+                    "Face On Bolometric Temperature [K]": f"{selected_tbol["Face On"]:.2f}",
+                    "Edge On (A) Bolometric Temperature [K]": f"{selected_tbol["Edge On (A)"]:.2f}",
+                    "Edge On (B) Bolometric Temperature [K]": f"{selected_tbol["Edge On (B)"]:.2f}"
                 }
                 st.dataframe(pd.DataFrame([data]).T, width="stretch")
 
@@ -277,170 +281,69 @@ with col2:
                                 except:
                                     st.error("CASA simalma image not found for this snapshot and viewpoint.")
                 elif st.session_state.image_viewtype == "Multi Image":
-                    # Set up controls for doing multi-view 
-                    main_col, optional_col = st.columns(2)
-                    with main_col:
-                        view_comparison = st.pills("Choose which properties to compare", ["View Direction", "Molecule", "Moment"], default=st.session_state.view_comparison, selection_mode="single")
-                    st.session_state.view_comparison = view_comparison
+                    if page == "Column Density":
+                        multiview_cols = st.columns(3)
+                        views = ["face-on", "edge-on-A", "edge-on-B"]
 
-                    option1_col, option2_col, option3_col = st.columns(3)
+                        for i, view_col in enumerate(multiview_cols):
+                            if st.session_state.viewpoint is not None:
+                                try:
+                                    st.image("./column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(views[i]))
+                                except: 
+                                    st.error("Column density image not found for this snapshot and viewpoint.")
+                    elif page == "Temperature":
+                        multiview_cols = st.columns(3)
+                        views = ["face-on", "edge-on-A", "edge-on-B"]
 
+                        for i, view_col in enumerate(multiview_cols):
+                            if st.session_state.viewpoint is not None:
+                                try:
+                                    st.image("./temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(views[i]))
+                                except: 
+                                    st.error("Temperature image not found for this snapshot and viewpoint.")
+                    elif page == "Images":
+                        # Set up controls for doing multi-view 
+                        main_col, optional_col = st.columns(2)
+                        with main_col:
+                            view_comparison = st.pills("Choose which properties to compare", ["View Direction", "Molecule", "Moment"], default=st.session_state.view_comparison, selection_mode="single")
+                        st.session_state.view_comparison = view_comparison
 
-                    if st.session_state.view_comparison == "View Direction":
-                        with option1_col:
-                            molecule = st.pills("Molecular Transition", ["H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "$^{13}$CO J = 2-1", "C$^{18}$O J = 2-1"], selection_mode="single", default=st.session_state.molecule, 
-                                                key="molecule_pills", width="stretch")
-                            st.session_state.molecule = molecule
-                        with option2_col:
-                            moment = st.pills("Select moment to view", ["Moment 0", "Moment 1", "Moment 8", "Moment 9"], selection_mode="single", default=st.session_state.moment, key="moment_pills", width="stretch")
-                            st.session_state.moment = moment
-                        with option3_col:
-                            img_type = st.pills("Choose image type", ["Image generated by RADMC-3D", "Image run through CASA simalma"], selection_mode="single", default=st.session_state.image_type, 
-                                                key="image_type_pills", width="stretch")
-                            st.session_state.image_type = img_type
-                        
-                        if st.session_state.molecule is not None and st.session_state.moment is not None and st.session_state.image_type is not None:
-                            # Plot the different views
-                            img1, img2, img3 = st.columns(3)
-                            views = ["face-on", "edge-on-A", "edge-on-B"]
-
-                            for i, img_col in enumerate([img1, img2, img3]):
-                                with img_col:
-                                    if st.session_state.image_type == "Image generated by RADMC-3D":
-                                        # Generate the name using the session state variable
-                                        if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
-                                            img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                            st.session_state.moment.split()[-1],
-                                            st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                            views[i]
-                                            )
-                                        elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                            img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                            st.session_state.moment.split()[-1],
-                                            st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                            views[i]
-                                            )
-                                        try:
-                                            st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                        except:
-                                            st.error("RADMC-3D image not found for this snapshot and viewpoint.")
-
-                                    elif st.session_state.image_type == "Image run through CASA simalma":
-                                        # Generate the name using the session state variables
-                                        if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
-                                            img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                            st.session_state.moment.split()[-1],
-                                            st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                            views[i]
-                                            )
-                                        elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                            img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                            st.session_state.moment.split()[-1],
-                                            st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                            views[i]
-                                            )
-                                        try:
-                                            st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                        except:
-                                            st.error("CASA simalma image not found for this snapshot and viewpoint.")
+                        option1_col, option2_col, option3_col = st.columns(3)
 
 
-
-                    elif st.session_state.view_comparison == "Molecule":
-                        with option1_col:
-                            viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint, key="viewpoint_pills", width="stretch")
-                            st.session_state.viewpoint = viewpoint
-                        with option2_col:
-                            moment = st.pills("Select moment to view", ["Moment 0", "Moment 1", "Moment 8", "Moment 9"], selection_mode="single", default=st.session_state.moment, key="moment_pills", width="stretch")
-                            st.session_state.moment = moment
-                        with option3_col:
-                            img_type = st.pills("Choose image type", ["Image generated by RADMC-3D", "Image run through CASA simalma"], selection_mode="single", default=st.session_state.image_type, 
-                                                key="image_type_pills", width="stretch")
-                            st.session_state.image_type = img_type
-
-                        if st.session_state.viewpoint is not None and st.session_state.moment is not None and st.session_state.image_type is not None:
-                            # Plot the different views
-                            img1, img2, img3 = st.columns(3)
-                            molecules = ["H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "$^{13}$CO J = 2-1", "C$^{18}$O J = 2-1"]
-
-                            for i, img_col in enumerate([img1, img2, img3]):
-                                with img_col:
-                                    if st.session_state.image_type == "Image generated by RADMC-3D":
-                                        # Generate the name using the session state variable
-                                        if molecules[i] == "$^{13}$CO J = 2-1" or molecules[i] == "C$^{18}$O J = 2-1":
-                                            img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                            st.session_state.moment.split()[-1],
-                                            molecules[i].replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                            view_keys[st.session_state.viewpoint]
-                                            )
-                                        elif molecules[i] == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                            img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                            st.session_state.moment.split()[-1],
-                                            molecules[i].replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                            view_keys[st.session_state.viewpoint]
-                                            )
-                                        try:
-                                            st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                        except:
-                                            st.error("RADMC-3D image not found for this snapshot and viewpoint.")
-
-                                    elif st.session_state.image_type == "Image run through CASA simalma":
-                                        # Generate the name using the session state variables
-                                        if molecules[i] == "$^{13}$CO J = 2-1" or molecules[i] == "C$^{18}$O J = 2-1":
-                                            img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                            st.session_state.moment.split()[-1],
-                                            molecules[i].replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                            view_keys[st.session_state.viewpoint]
-                                            )
-                                        elif molecules[i] == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                            img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                            st.session_state.moment.split()[-1],
-                                            molecules[i].replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                            view_keys[st.session_state.viewpoint]
-                                            )
-                                        try:
-                                            st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                        except:
-                                            st.error("CASA simalma image not found for this snapshot and viewpoint.")
-
-
-
-
-                    elif st.session_state.view_comparison == "Moment":
-                        with optional_col:
-                            multi_moments = st.pills("Which moment maps would you like to view?", ["Moment 0", "Moment 1", "Moment 8", "Moment 9"], default=st.session_state.multi_moments, selection_mode="multi")
-                            st.session_state.multi_moments = sorted(multi_moments) if multi_moments else []
-                        with option1_col:
-                            viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint, key="viewpoint_pills", width="stretch")
-                            st.session_state.viewpoint = viewpoint
-                        with option2_col:
-                            molecule = st.pills("Molecular Transition", ["H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "$^{13}$CO J = 2-1", "C$^{18}$O J = 2-1"], selection_mode="single", default=st.session_state.molecule, 
-                                                key="molecule_pills", width="stretch")
-                            st.session_state.molecule = molecule
-                        with option3_col:
-                            img_type = st.pills("Choose image type", ["Image generated by RADMC-3D", "Image run through CASA simalma"], selection_mode="single", default=st.session_state.image_type, 
-                                                key="image_type_pills", width="stretch")
-                            st.session_state.image_type = img_type
-
-                        if st.session_state.viewpoint is not None and st.session_state.molecule is not None and st.session_state.image_type is not None and st.session_state.multi_moments:
+                        if st.session_state.view_comparison == "View Direction":
+                            with option1_col:
+                                molecule = st.pills("Molecular Transition", ["H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "$^{13}$CO J = 2-1", "C$^{18}$O J = 2-1"], selection_mode="single", default=st.session_state.molecule, 
+                                                    key="molecule_pills", width="stretch")
+                                st.session_state.molecule = molecule
+                            with option2_col:
+                                moment = st.pills("Select moment to view", ["Moment 0", "Moment 1", "Moment 8", "Moment 9"], selection_mode="single", default=st.session_state.moment, key="moment_pills", width="stretch")
+                                st.session_state.moment = moment
+                            with option3_col:
+                                img_type = st.pills("Choose image type", ["Image generated by RADMC-3D", "Image run through CASA simalma"], selection_mode="single", default=st.session_state.image_type, 
+                                                    key="image_type_pills", width="stretch")
+                                st.session_state.image_type = img_type
+                            
+                            if st.session_state.molecule is not None and st.session_state.moment is not None and st.session_state.image_type is not None:
                                 # Plot the different views
-                                cols = st.columns(int(len(st.session_state.multi_moments)))
+                                img1, img2, img3 = st.columns(3)
+                                views = ["face-on", "edge-on-A", "edge-on-B"]
 
-                                for i, img_col in enumerate(cols):
+                                for i, img_col in enumerate([img1, img2, img3]):
                                     with img_col:
                                         if st.session_state.image_type == "Image generated by RADMC-3D":
                                             # Generate the name using the session state variable
                                             if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
                                                 img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                                st.session_state.multi_moments[i].split()[-1],
+                                                st.session_state.moment.split()[-1],
                                                 st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                                view_keys[st.session_state.viewpoint]
+                                                views[i]
                                                 )
                                             elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
                                                 img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                                st.session_state.multi_moments[i].split()[-1],
+                                                st.session_state.moment.split()[-1],
                                                 st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                                view_keys[st.session_state.viewpoint]
+                                                views[i]
                                                 )
                                             try:
                                                 st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
@@ -451,20 +354,142 @@ with col2:
                                             # Generate the name using the session state variables
                                             if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
                                                 img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                                st.session_state.multi_moments[i].split()[-1],
+                                                st.session_state.moment.split()[-1],
                                                 st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                                view_keys[st.session_state.viewpoint]
+                                                views[i]
                                                 )
                                             elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
                                                 img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                                st.session_state.multi_moments[i].split()[-1],
+                                                st.session_state.moment.split()[-1],
                                                 st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
+                                                views[i]
+                                                )
+                                            try:
+                                                st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
+                                            except:
+                                                st.error("CASA simalma image not found for this snapshot and viewpoint.")
+
+
+
+                        elif st.session_state.view_comparison == "Molecule":
+                            with option1_col:
+                                viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint, key="viewpoint_pills", width="stretch")
+                                st.session_state.viewpoint = viewpoint
+                            with option2_col:
+                                moment = st.pills("Select moment to view", ["Moment 0", "Moment 1", "Moment 8", "Moment 9"], selection_mode="single", default=st.session_state.moment, key="moment_pills", width="stretch")
+                                st.session_state.moment = moment
+                            with option3_col:
+                                img_type = st.pills("Choose image type", ["Image generated by RADMC-3D", "Image run through CASA simalma"], selection_mode="single", default=st.session_state.image_type, 
+                                                    key="image_type_pills", width="stretch")
+                                st.session_state.image_type = img_type
+
+                            if st.session_state.viewpoint is not None and st.session_state.moment is not None and st.session_state.image_type is not None:
+                                # Plot the different views
+                                img1, img2, img3 = st.columns(3)
+                                molecules = ["H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "$^{13}$CO J = 2-1", "C$^{18}$O J = 2-1"]
+
+                                for i, img_col in enumerate([img1, img2, img3]):
+                                    with img_col:
+                                        if st.session_state.image_type == "Image generated by RADMC-3D":
+                                            # Generate the name using the session state variable
+                                            if molecules[i] == "$^{13}$CO J = 2-1" or molecules[i] == "C$^{18}$O J = 2-1":
+                                                img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
+                                                st.session_state.moment.split()[-1],
+                                                molecules[i].replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
+                                                view_keys[st.session_state.viewpoint]
+                                                )
+                                            elif molecules[i] == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
+                                                img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
+                                                st.session_state.moment.split()[-1],
+                                                molecules[i].replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
+                                                view_keys[st.session_state.viewpoint]
+                                                )
+                                            try:
+                                                st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
+                                            except:
+                                                st.error("RADMC-3D image not found for this snapshot and viewpoint.")
+
+                                        elif st.session_state.image_type == "Image run through CASA simalma":
+                                            # Generate the name using the session state variables
+                                            if molecules[i] == "$^{13}$CO J = 2-1" or molecules[i] == "C$^{18}$O J = 2-1":
+                                                img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
+                                                st.session_state.moment.split()[-1],
+                                                molecules[i].replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
+                                                view_keys[st.session_state.viewpoint]
+                                                )
+                                            elif molecules[i] == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
+                                                img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
+                                                st.session_state.moment.split()[-1],
+                                                molecules[i].replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
                                                 view_keys[st.session_state.viewpoint]
                                                 )
                                             try:
                                                 st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
                                             except:
                                                 st.error("CASA simalma image not found for this snapshot and viewpoint.")
+
+
+
+
+                        elif st.session_state.view_comparison == "Moment":
+                            with optional_col:
+                                multi_moments = st.pills("Which moment maps would you like to view?", ["Moment 0", "Moment 1", "Moment 8", "Moment 9"], default=st.session_state.multi_moments, selection_mode="multi")
+                                st.session_state.multi_moments = sorted(multi_moments) if multi_moments else []
+                            with option1_col:
+                                viewpoint = st.pills("View Direction", ["Face On", "Edge On (A)", "Edge On (B)"], selection_mode="single", default=st.session_state.viewpoint, key="viewpoint_pills", width="stretch")
+                                st.session_state.viewpoint = viewpoint
+                            with option2_col:
+                                molecule = st.pills("Molecular Transition", ["H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "$^{13}$CO J = 2-1", "C$^{18}$O J = 2-1"], selection_mode="single", default=st.session_state.molecule, 
+                                                    key="molecule_pills", width="stretch")
+                                st.session_state.molecule = molecule
+                            with option3_col:
+                                img_type = st.pills("Choose image type", ["Image generated by RADMC-3D", "Image run through CASA simalma"], selection_mode="single", default=st.session_state.image_type, 
+                                                    key="image_type_pills", width="stretch")
+                                st.session_state.image_type = img_type
+
+                            if st.session_state.viewpoint is not None and st.session_state.molecule is not None and st.session_state.image_type is not None and st.session_state.multi_moments:
+                                    # Plot the different views
+                                    cols = st.columns(int(len(st.session_state.multi_moments)))
+
+                                    for i, img_col in enumerate(cols):
+                                        with img_col:
+                                            if st.session_state.image_type == "Image generated by RADMC-3D":
+                                                # Generate the name using the session state variable
+                                                if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
+                                                    img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
+                                                    st.session_state.multi_moments[i].split()[-1],
+                                                    st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
+                                                    view_keys[st.session_state.viewpoint]
+                                                    )
+                                                elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
+                                                    img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
+                                                    st.session_state.multi_moments[i].split()[-1],
+                                                    st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
+                                                    view_keys[st.session_state.viewpoint]
+                                                    )
+                                                try:
+                                                    st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
+                                                except:
+                                                    st.error("RADMC-3D image not found for this snapshot and viewpoint.")
+
+                                            elif st.session_state.image_type == "Image run through CASA simalma":
+                                                # Generate the name using the session state variables
+                                                if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
+                                                    img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
+                                                    st.session_state.multi_moments[i].split()[-1],
+                                                    st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
+                                                    view_keys[st.session_state.viewpoint]
+                                                    )
+                                                elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
+                                                    img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
+                                                    st.session_state.multi_moments[i].split()[-1],
+                                                    st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
+                                                    view_keys[st.session_state.viewpoint]
+                                                    )
+                                                try:
+                                                    st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
+                                                except:
+                                                    st.error("CASA simalma image not found for this snapshot and viewpoint.")
 
                             
             if iout in unconverged_sinkdict[str(isink)]:
