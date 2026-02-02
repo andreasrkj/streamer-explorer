@@ -125,7 +125,7 @@ with col1:
         with chartcol2:
             fig2 = px.line(df, x="Sink Age", y="Accretion Rate", labels={'Sink Age':'Sink Age [kyr]', 'Accretion Rate':'Accretion Rate [Msun/yr]'})
             fig2.update_layout(clickmode='select', overwrite=True)
-            fig2.update_traces(customdata=snapshots, hovertemplate="<b>Snapshot %{customdata:04d}</b><br>Sink Age: %{x:.2f} kyr<br>Accretion Rate: %{y:.4f} Msun/yr<extra></extra>", mode="lines+markers")
+            fig2.update_traces(customdata=snapshots, hovertemplate="<b>Snapshot %{customdata:04d}</b><br>Sink Age: %{x:.2f} kyr<br>Accretion Rate: %{y:.4f} Msun/kyr<extra></extra>", mode="lines+markers")
             
             # Add selected points if any
             if st.session_state.selected_point is not None:
