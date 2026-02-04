@@ -285,23 +285,21 @@ with col2:
                         views = ["face-on", "edge-on-A", "edge-on-B"]
 
                         for i, view_col in enumerate(multiview_cols):
-                            if st.session_state.viewpoint is not None:
-                                with view_col:
-                                    try:
-                                        st.image("./column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(views[i]))
-                                    except: 
-                                        st.error("Column density image not found for this snapshot and viewpoint.")
+                            with view_col:
+                                try:
+                                    st.image("./column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(views[i]))
+                                except: 
+                                    st.error("Column density image not found for this snapshot and viewpoint.")
                     elif page == "Temperature":
                         multiview_cols = st.columns(3)
                         views = ["face-on", "edge-on-A", "edge-on-B"]
 
                         for i, view_col in enumerate(multiview_cols):
-                            if st.session_state.viewpoint is not None:
-                                with view_col:
-                                    try:
-                                        st.image("./temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(views[i]))
-                                    except: 
-                                        st.error("Temperature image not found for this snapshot and viewpoint.")
+                            with view_col:
+                                try:
+                                    st.image("./temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(views[i]))
+                                except: 
+                                    st.error("Temperature image not found for this snapshot and viewpoint.")
                     elif page == "Images":
                         # Set up controls for doing multi-view 
                         main_col, optional_col = st.columns(2)
