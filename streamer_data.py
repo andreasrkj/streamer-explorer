@@ -101,6 +101,7 @@ with col1:
 
         df = pd.read_csv("sink_histories/sink{:>03}_history.dat".format(int(isink)), names=["Sink Age", "Mass", "Accretion Rate"], header=0)
         df["Sink Age"] /= 1.0e3  # Convert to kyr
+        df["Accretion Rate"] *= 1e5 # Convert to 1e-5 Msun/yr
 
         chartcol1, chartcol2 = st.columns(2)
         
@@ -123,9 +124,9 @@ with col1:
                     st.rerun()
 
         with chartcol2:
-            fig2 = px.line(df, x="Sink Age", y="Accretion Rate", labels={'Sink Age':'Sink Age [kyr]', 'Accretion Rate':'Accretion Rate [Msun/yr]'})
+            fig2 = px.line(df, x="Sink Age", y="Accretion Rate", labels={'Sink Age':'Sink Age [kyr]', 'Accretion Rate':'Accretion Rate [$10^{-5}$Msun/yr]'})
             fig2.update_layout(clickmode='select', overwrite=True)
-            fig2.update_traces(customdata=snapshots, hovertemplate="<b>Snapshot %{customdata:04d}</b><br>Sink Age: %{x:.2f} kyr<br>Accretion Rate: %{y:.4f} Msun/kyr<extra></extra>", mode="lines+markers")
+            fig2.update_traces(customdata=snapshots, hovertemplate="<b>Snapshot %{customdata:04d}</b><br>Sink Age: %{x:.2f} kyr<br>Accretion Rate: %{y:.4f} $10^{-5}$Msun/yr<extra></extra>", mode="lines+markers")
             
             # Add selected points if any
             if st.session_state.selected_point is not None:
@@ -198,7 +199,7 @@ with col2:
                 data = {
                     "Sink Age [kyr]": f"{selected_row['Sink Age']:.2f}",
                     "Mass [Msun]": f"{selected_row['Mass']:.4f}",
-                    "Accretion Rate [Msun/yr]": f"{selected_row['Accretion Rate']:.4f}",
+                    "Accretion Rate [$10^{-5}$Msun/yr]": f"{selected_row['Accretion Rate']:.4f}",
                     "Face On Bolometric Temperature [K]": f"{selected_tbol["Face On"]:.2f}",
                     "Edge On (A) Bolometric Temperature [K]": f"{selected_tbol["Edge On (A)"]:.2f}",
                     "Edge On (B) Bolometric Temperature [K]": f"{selected_tbol["Edge On (B)"]:.2f}"
