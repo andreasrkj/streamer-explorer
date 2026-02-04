@@ -101,7 +101,6 @@ with col1:
 
         df = pd.read_csv("sink_histories/sink{:>03}_history.dat".format(int(isink)), names=["Sink Age", "Mass", "Accretion Rate"], header=0)
         df["Sink Age"] /= 1.0e3  # Convert to kyr
-        df["Accretion Rate"] *= 1e5 # Convert to 1e-5 Msun/yr
 
         chartcol1, chartcol2 = st.columns(2)
         
