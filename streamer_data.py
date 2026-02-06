@@ -290,6 +290,7 @@ with col2:
                                     st.image("./column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(views[i]))
                                 except: 
                                     st.error("Column density image not found for this snapshot and viewpoint.")
+                                st.write(list(view_keys.keys())[list(view_keys.values()).index(views[i])])
                     elif page == "Temperature":
                         multiview_cols = st.columns(3)
                         views = ["face-on", "edge-on-A", "edge-on-B"]
@@ -300,6 +301,7 @@ with col2:
                                     st.image("./temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(views[i]))
                                 except: 
                                     st.error("Temperature image not found for this snapshot and viewpoint.")
+                                st.write(list(view_keys.keys())[list(view_keys.values()).index(views[i])])
                     elif page == "Images":
                         # Set up controls for doing multi-view 
                         main_col, optional_col = st.columns(2)
@@ -367,6 +369,7 @@ with col2:
                                                 st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
                                             except:
                                                 st.error("CASA simalma image not found for this snapshot and viewpoint.")
+                                        st.write(list(view_keys.keys())[list(view_keys.values()).index(views[i])])
 
 
 
