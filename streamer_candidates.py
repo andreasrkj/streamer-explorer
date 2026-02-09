@@ -72,16 +72,15 @@ if st.session_state.selected_event is not None:
             view_options = [key for key, value in view_keys.items() if value in event_views]
             candidate_viewpoint = st.pills("Choose viewpoint", view_options, default=st.session_state.candidate_viewpoint)
             st.session_state.candidate_viewpoint = candidate_viewpoint
-            
         else:
-            st.session_state.candidate_viewpoint = event_views[0]
+            st.session_state.candidate_viewpoint = view_keys.keys()[list(view_keys.values()).index(event_views[0])]
 
         if len(event_mols) > 1: # If more than one molecule available
             mol_options = [key for key, value in mol_keys.items() if value in event_mols]
             candidate_molecule = st.pills("Choose molecules", mol_options, default=st.session_state.candidate_molecule)
             st.session_state.candidate_molecule = candidate_molecule
         else:
-            st.session_state.candidate_molecule = event_mols[0]
+            st.session_state.candidate_molecule = mol_keys.keys()[list(mol_keys.values()).index(event_mols[0])]
 
     if st.session_state.candidate_viewpoint is not None and st.session_state.candidate_molecule is not None:
         st.subheader("Temporal evolution :material/arrow_right_alt:", anchor=False)
@@ -92,18 +91,18 @@ if st.session_state.selected_event is not None:
             with icol:
                 for moment in [8,9]:
                     # Generate the name using the session state variables
-                    mol_name = st.session_state.candidate_molecule
+                    mol_name = mol_keys[st.session_state.candidate_molecule]
                     if mol_name in ["13co", "c18o"]:
                         img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
                         moment,
                         mol_name,
-                        st.session_state.candidate_viewpoint
+                        view_keys[st.session_state.candidate_viewpoint]
                         )
                     elif mol_name == "ph2co":
                         img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
                         moment,
                         mol_name,
-                        st.session_state.candidate_viewpoint
+                        view_keys[st.session_state.candidate_viewpoint]
                         )
                     try:
                         st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, snaps[i])+img_name)
