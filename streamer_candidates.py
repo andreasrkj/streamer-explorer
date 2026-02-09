@@ -73,14 +73,14 @@ if st.session_state.selected_event is not None:
             candidate_viewpoint = st.pills("Choose viewpoint", view_options, default=st.session_state.candidate_viewpoint)
             st.session_state.candidate_viewpoint = candidate_viewpoint
         else:
-            st.session_state.candidate_viewpoint = view_keys.keys()[list(view_keys.values()).index(event_views[0])]
+            st.session_state.candidate_viewpoint = list(view_keys.keys())[list(view_keys.values()).index(event_views[0])]
 
         if len(event_mols) > 1: # If more than one molecule available
             mol_options = [key for key, value in mol_keys.items() if value in event_mols]
             candidate_molecule = st.pills("Choose molecules", mol_options, default=st.session_state.candidate_molecule)
             st.session_state.candidate_molecule = candidate_molecule
         else:
-            st.session_state.candidate_molecule = mol_keys.keys()[list(mol_keys.values()).index(event_mols[0])]
+            st.session_state.candidate_molecule = list(mol_keys.keys())[list(mol_keys.values()).index(event_mols[0])]
 
     if st.session_state.candidate_viewpoint is not None and st.session_state.candidate_molecule is not None:
         st.subheader("Temporal evolution :material/arrow_right_alt:", anchor=False)
