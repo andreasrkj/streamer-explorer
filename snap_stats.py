@@ -4,7 +4,7 @@ st.set_page_config(layout="wide")
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from ._dictionaries import sink_dict, unconverged_sinkdict, total_calculation_time
+from _dictionaries import sink_dict, unconverged_sinkdict, total_calculation_time
 
 def _get_missing_files(sink_id, folder="./temperatures/"):
     # Now check whether any images are missing in the folder

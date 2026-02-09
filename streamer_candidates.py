@@ -2,7 +2,7 @@ import os
 import streamlit as st
 st.set_page_config(layout="wide")
 import numpy as np
-from ._dictionaries import sink_dict, view_keys, mol_keys, event_list, questioned_events
+from _dictionaries import sink_dict, view_keys, mol_keys, event_list, questioned_events
 from collections import Counter
 
 st.title("Explore Streamer Candidates", anchor=False)
