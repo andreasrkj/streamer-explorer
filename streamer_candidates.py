@@ -72,6 +72,7 @@ if st.session_state.selected_event is not None:
             view_options = [key for key, value in view_keys.items() if value in event_views]
             candidate_viewpoint = st.pills("Choose viewpoint", view_options, default=st.session_state.candidate_viewpoint)
             st.session_state.candidate_viewpoint = candidate_viewpoint
+            
         else:
             st.session_state.candidate_viewpoint = event_views[0]
 
@@ -91,7 +92,7 @@ if st.session_state.selected_event is not None:
             with icol:
                 for moment in [8,9]:
                     # Generate the name using the session state variables
-                    mol_name = mol_keys[st.session_state.candidate_molecule]
+                    mol_name = st.session_state.candidate_molecule
                     if mol_name in ["13co", "c18o"]:
                         img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
                         moment,
