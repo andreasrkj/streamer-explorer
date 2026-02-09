@@ -96,13 +96,13 @@ if st.session_state.selected_event is not None:
                         img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
                         moment,
                         mol_name,
-                        view_keys[st.session_state.candidate_viewpoint]
+                        st.session_state.candidate_viewpoint
                         )
                     elif mol_name == "ph2co":
                         img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
                         moment,
                         mol_name,
-                        view_keys[st.session_state.candidate_viewpoint]
+                        st.session_state.candidate_viewpoint
                         )
                     try:
                         st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, snaps[i])+img_name)
