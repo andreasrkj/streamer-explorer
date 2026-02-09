@@ -4,42 +4,12 @@ st.set_page_config(layout="wide")
 import numpy as np
 import pandas as pd
 import plotly.express as px
+from ._dictionaries import sink_dict, view_keys, unconverged_sinkdict
 
-sink_dict = {
-    "6"  : (170,1080),
-    "13" : (230,2600),
-    "24" : (220,1370),
-    "82" : (240,1310),
-    "122": (350,1100),
-    "162": (410,2040),
-    "180": (410,1520),
-    "225": (450,1330)
-}
-
-unconverged_sinkdict = {
-    "6"  : [],
-    "13" : [2210,2220,2230,2240,2250,2260,2270,2280,2290,2300,2310,2320,2330,2430,2440,2450,2460,2470,2480,2490,2500,2510,2520,2530,2540,2550,2560,2570,2580,2590,2600],
-    "24" : [390,400,410,420,430,440,450,460,470,480,490,1010],
-    "82" : [1140,1150,1160,1170,1180,1240,1260,1270,1290],
-    "122": [],
-    "162": [],
-    "180": [],
-    "225": []
-}
-
-view_keys = {
-    "Face On": "face-on",
-    "Edge On (A)": "edge-on-A",
-    "Edge On (B)": "edge-on-B"
-}
-
-
-st.title("Streamer data", anchor=False)
+st.title("Explore the dataset", anchor=False)
 
 if "display_iout_options" not in st.session_state:
     st.session_state.display_iout_options = True
-if "is_loading" not in st.session_state:
-    st.session_state.is_loading = False
 if "page" not in st.session_state:
     st.session_state.page = None
 
@@ -196,12 +166,12 @@ with col2:
                 selected_row = df.iloc[st.session_state.selected_point]
                 selected_tbol = df_tbol.iloc[st.session_state.selected_point]
                 data = {
-                    "Sink Age [kyr]": f"{selected_row['Sink Age']:.2f}",
-                    "Mass [Msun]": f"{selected_row['Mass']:.4f}",
-                    "Accretion Rate [Msun/yr]": f"{selected_row['Accretion Rate']:.2e}",
-                    "Face On Bolometric Temperature [K]": f"{selected_tbol["Face On"]:.2f}",
-                    "Edge On (A) Bolometric Temperature [K]": f"{selected_tbol["Edge On (A)"]:.2f}",
-                    "Edge On (B) Bolometric Temperature [K]": f"{selected_tbol["Edge On (B)"]:.2f}"
+                    "Sink Age [kyr]": "{:.2f}".format(selected_row['Sink Age']),
+                    "Mass [Msun]": "{:.4f}".format(selected_row['Mass']),
+                    "Accretion Rate [Msun/yr]": "{:.2e}".format(selected_row['Accretion Rate']),
+                    "Face On Bolometric Temperature [K]": "{:.2f}".format(selected_tbol["Face On"]),
+                    "Edge On (A) Bolometric Temperature [K]": "{:.2f}".format(selected_tbol["Edge On (A)"]),
+                    "Edge On (B) Bolometric Temperature [K]": "{:.2f}".format(selected_tbol["Edge On (B)"])
                 }
                 st.dataframe(pd.DataFrame([data]).T, width="stretch")
 

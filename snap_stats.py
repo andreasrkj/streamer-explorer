@@ -4,39 +4,7 @@ st.set_page_config(layout="wide")
 import numpy as np
 import pandas as pd
 import plotly.express as px
-
-sink_dict = {
-    "6"  : (170,1080),
-    "13" : (230,2600),
-    "24" : (220,1370),
-    "82" : (240,1310),
-    "122": (350,1100),
-    "162": (410,2040),
-    "180": (410,1520),
-    "225": (450,1330)
-}
-
-unconverged_sinkdict = {
-    "6"  : [],
-    "13" : [2210,2220,2230,2240,2250,2260,2270,2280,2290,2300,2310,2320,2330,2430,2440,2450,2460,2470,2480,2490,2500,2510,2520,2530,2540,2550,2560,2570,2580,2590,2600],
-    "24" : [390,400,410,420,430,440,450,460,470,480,490,1010],
-    "82" : [1140,1150,1160,1170,1180,1240,1260,1270,1290],
-    "122": [],
-    "162": [],
-    "180": [],
-    "225": []
-}
-
-total_calculation_time = { # total CPU hours
-    "6"  : 83369.79,
-    "13" : 150414.5199,
-    "24" : 146770.4968,
-    "82" : 77031.37545,
-    "122": 93333.53278,
-    "162": 85745.96947,
-    "180": 41178.78426,
-    "225": 58922.46438
-}
+from ._dictionaries import sink_dict, unconverged_sinkdict, total_calculation_time
 
 def _get_missing_files(sink_id, folder="./temperatures/"):
     # Now check whether any images are missing in the folder
