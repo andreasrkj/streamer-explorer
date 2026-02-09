@@ -4,7 +4,7 @@ st.set_page_config(layout="wide")
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from ._dictionaries import sink_dict, view_keys, unconverged_sinkdict
+from _dictionaries import sink_dict, view_keys, unconverged_sinkdict
 
 st.title("Explore the dataset", anchor=False)
 
