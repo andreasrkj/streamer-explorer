@@ -62,7 +62,12 @@ with col1:
 
         ievent = st.selectbox("Select a streamer candidate event", events, index=event_index, 
                               placeholder="Select the streamer candidate event you wish to look at", accept_new_options=True)
-        st.session_state.selected_event = ievent
+        # Reset values if event is changed
+        if ievent != st.session_state.selected_event:
+            st.session_state.selected_event = ievent
+            st.session_state.candidate_viewpoint = None
+            st.session_state.candidate_molecule = None
+            
 if st.session_state.selected_event is not None:
     # Unpack the values of ievent
     (nstart, nend, event_views, event_mols) = event_list[str(isink)][events.index(st.session_state.selected_event)]
