@@ -36,8 +36,7 @@ with col1:
     if isink is not None:
         # Format the event list
         events = []
-        questionable_events = []
-        for i, event in enumerate(candidate_dir[isink]):
+        for i, event in enumerate(candidate_dir[int(isink)]):
             (nstart, nend, event_views, event_mols) = event
             fname = "sc_s{:03d}_{:04d}_{:04d}".format(int(isink), nstart, nend)
             events.append(fname)
@@ -66,8 +65,8 @@ with col1:
             
 if st.session_state.selected_event is not None:
     # Unpack the values of ievent
-    (nstart, nend, event_views, event_mols) = candidate_dir[isink][events.index(st.session_state.selected_event)]
-    candidate_note = candidatenote_dir[isink][events.index(st.session_state.selected_event)]
+    (nstart, nend, event_views, event_mols) = candidate_dir[int(isink)][events.index(st.session_state.selected_event)]
+    candidate_note = candidatenote_dir[int(isink)][events.index(st.session_state.selected_event)]
     with col2:
         # Create the buttons for possible selections
         if len(event_views) > 1: # If more than one view available
