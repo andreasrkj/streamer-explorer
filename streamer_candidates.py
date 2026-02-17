@@ -88,7 +88,7 @@ if st.session_state.selected_event is not None:
 
         # Get molecule name as [-4:] to get "ph2co" -> "h2co"
         iview = view_keys[st.session_state.candidate_viewpoint]
-        imol = mol_keys[st.session_state.candidate_molecule]
+        imol = mol_keys[st.session_state.candidate_molecule][-4:]
 
         anim_name = "sc_s{:03d}_{:04d}_{:04d}_{}_{}".format(int(isink), nstart, nend, iview, imol)
         output_path = "./candidate_animations/sink{:03d}/".format(int(isink))+anim_name+".mp4"
