@@ -2,13 +2,13 @@ import os
 import streamlit as st
 st.set_page_config(layout="wide")
 import numpy as np
-from _dictionaries import sink_dict, view_keys, mol_keys, event_list, questioned_events
+from _dictionaries import sink_dict, view_keys, mol_keys, candidate_dir, candidatenote_dir
 from collections import Counter
 
 st.title("Explore Streamer Candidates", anchor=False)
 
 # Create columns (one for selection, another for the data itself)
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 
 with col1:
     # Find the index of the currently selected sink if it exists
@@ -37,14 +37,10 @@ with col1:
         # Format the event list
         events = []
         questionable_events = []
-        for i, event in enumerate(event_list[str(isink)]):
+        for i, event in enumerate(candidate_dir[isink]):
             (nstart, nend, event_views, event_mols) = event
             fname = "sc_s{:03d}_{:04d}_{:04d}".format(int(isink), nstart, nend)
             events.append(fname)
-        for i, event in enumerate(questioned_events[str(isink)]):
-            (nstart, nend, event_views, event_mols) = event
-            fname = "sc_s{:03d}_{:04d}_{:04d}".format(int(isink), nstart, nend)
-            questionable_events.append(fname)
         # Let's check if there are ones with multiple configs, and rename accordingly
         c = Counter(events)
         dupes = {num: [i for i, x in enumerate(events) if x == num] for num, cnt in c.items() if cnt > 1}
@@ -70,7 +66,8 @@ with col1:
             
 if st.session_state.selected_event is not None:
     # Unpack the values of ievent
-    (nstart, nend, event_views, event_mols) = event_list[str(isink)][events.index(st.session_state.selected_event)]
+    (nstart, nend, event_views, event_mols) = candidate_dir[isink][events.index(st.session_state.selected_event)]
+    candidate_note = candidatenote_dir[isink][events.index(st.session_state.selected_event)]
     with col2:
         # Create the buttons for possible selections
         if len(event_views) > 1: # If more than one view available
@@ -88,30 +85,25 @@ if st.session_state.selected_event is not None:
             st.session_state.candidate_molecule = list(mol_keys.keys())[list(mol_keys.values()).index(event_mols[0])]
 
     if st.session_state.candidate_viewpoint is not None and st.session_state.candidate_molecule is not None:
-        st.subheader("Temporal evolution :material/arrow_right_alt:", anchor=False)
-        # Figure out how many imgs to make
-        snaps = np.arange(nstart, nend+1, 10)
-        stream_cols = st.columns(len(snaps))
-        for i, icol in enumerate(stream_cols):
-            with icol:
-                for moment in [8,9]:
-                    # Generate the name using the session state variables
-                    mol_name = mol_keys[st.session_state.candidate_molecule]
-                    if mol_name in ["13co", "c18o"]:
-                        img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                        moment,
-                        mol_name,
-                        view_keys[st.session_state.candidate_viewpoint]
-                        )
-                    elif mol_name == "ph2co":
-                        img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                        moment,
-                        mol_name,
-                        view_keys[st.session_state.candidate_viewpoint]
-                        )
-                    try:
-                        st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, snaps[i])+img_name)
-                    except:
-                        st.error("CASA simalma image not found for this snapshot and viewpoint.")
-    if st.session_state.selected_event in questionable_events:
-        st.warning("This event has been marked as questionable.")
+        # If we have the viewpoint and molecule, we can get the 
+
+        # Get molecule name as [-4:] to get "ph2co" -> "h2co"
+        iview = view_keys[st.session_state.candidate_viewpoint]
+        imol = mol_keys[st.session_state.candidate_molecule]
+
+        anim_name = "sc_s{:03d}_{:04d}_{:04d}_{}_{}".format(int(isink), nstart, nend, iview, imol)
+        output_path = "./candidate_animations/sink{:03d}/".format(int(isink))+anim_name+".mp4"
+        
+        # Add the video playback
+        st.video(output_path, loop=True, autoplay=True, muted=True)
+
+        st.info("**Note attributed to this candidate:\n"+candidate_note, icon=":material/note_stack:")
+
+    with col3:
+        # This column displays info that seems necessary to know when you get the video
+        message = "**Once viewpoint and molecule is selected, a video of the candidate will appear.**\n" \
+                  "The video below displays **one** snapshot per second.\n" \
+                  "The moments from left to right: 0, 1, 2, 8 and 9.\n" \
+                  "The video automatically loops when it reaches the final snapshot.\n"
+
+        st.info(message, icon=":material/info:")
