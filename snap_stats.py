@@ -101,13 +101,13 @@ def completion_plot(sink_id):
         "SimALMA Imgs": f"./molecular_imgs/casa/{sink_path}/",
     }
     
-    # Different expected totals: 3 per snapshot for most, 36 for RADMC/SimALMA
+    # Different expected totals: 3 per snapshot for most, 45 for RADMC/SimALMA (36 currently because no moment 2 for RADMC-3D)
     expected_per_snapshot = {
         "Convergence": 1,
         "Column Density": 3,
         "Temperature": 3,
         "RADMC-3D Imgs": 36,
-        "SimALMA Imgs": 36,
+        "SimALMA Imgs": 45,
     }
     
     sink_stats = {}
