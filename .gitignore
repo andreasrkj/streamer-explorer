@@ -1,5 +1,10 @@
 .streamlit/secrets.toml
 
+# Large data directories
+molecular_imgs/
+column_densities/
+temperatures/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
