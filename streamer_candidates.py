@@ -96,7 +96,7 @@ if st.session_state.selected_event is not None:
         # Add the video playback
         st.video(output_path, loop=True, autoplay=True, muted=True)
 
-        st.info("**Note attributed to this candidate:\n"+candidate_note, icon=":material/note_stack:")
+        st.info("**Note attributed to this candidate:** "+candidate_note, icon=":material/note_stack:")
 
     with col3:
         # This column displays info that seems necessary to know when you get the video
