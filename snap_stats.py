@@ -199,7 +199,8 @@ if selected_sinks != []:
             if st.session_state.selected_stats == "Basic Stats":
                 basic_stats(sink_id)
             elif st.session_state.selected_stats == "Completion Plot":
-                completion_plot(sink_id)
+                st.write("Currently not available.")
+                #completion_plot(sink_id)
             elif st.session_state.selected_stats == "Convergence":
                 convergence(sink_id)
                 if icol == sink_cols[0]:

@@ -4,7 +4,7 @@ st.set_page_config(layout="wide")
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from _dictionaries import sink_dict, view_keys, unconverged_sinkdict
+from _dictionaries import sink_dict, view_keys, unconverged_sinkdict, data_url
 
 st.title("Explore the dataset", anchor=False)
 
@@ -13,9 +13,49 @@ if "display_iout_options" not in st.session_state:
 if "page" not in st.session_state:
     st.session_state.page = None
 
+# FUNCTION DEFINITIONS
+def show_image(radmc=False, simalma=False, view=st.session_state.viewpoint, molecule=st.session_state.molecule, moment=st.session_state.moment):
+    if simalma:
+        img_path = data_url+"molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout) + "simalma_"
+        err_msg  = "CASA simalma image not found for this snapshot and viewpoint."
+    elif radmc:
+        img_path = data_url+"molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)
+        err_msg  = "RADMC-3D image not found for this snapshot and viewpoint."
+
+    # Generate the name using the session state variables
+    if molecule == "$^{13}$CO J = 2-1" or molecule == "C$^{18}$O J = 2-1":
+        img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
+        moment.split()[-1],
+        molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
+        view_keys[view]
+        )
+    elif molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
+        img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
+        moment.split()[-1],
+        molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
+        view_keys[viewpoint]
+        )
+    try:
+        st.image(img_path+img_name)
+    except:
+        st.error(err_msg)
+
+def show_coldens(view=st.session_state.viewpoint):
+    try:
+        st.image(data_url+"column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(view_keys[view]))
+    except: 
+        st.error("Column density image not found for this snapshot and viewpoint.")
+
+def show_temp(view=st.session_state.viewpoint):
+    try:
+        st.image(data_url+"temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(view_keys[view]))
+    except:
+        st.error("Temperature image not found for this snapshot and viewpoint.")
+
 # Create columns (one for selection, another for the data itself)
 col1, col2 = st.columns(2)
 
+# CONTROL SNAPSHOTS + SEE SNAPSHOT STATS
 with col1:
     # Find the index of the currently selected sink if it exists
     sink_options = tuple(sink_dict.keys())
@@ -147,6 +187,7 @@ with col1:
                     st.session_state.selected_point = new_point
                     st.rerun()
 
+# IMAGE DISPLAY
 with col2:
     if isink is not None and iout is not None:
         header_col, selection_col = st.columns(2)
@@ -176,8 +217,8 @@ with col2:
                 st.dataframe(pd.DataFrame([data]).T, width="stretch")
 
             elif page == "Convergence":   
-                img_path = os.path.join("./convergence_plots", "sink{:>03}".format(isink), "o{:>04}.png".format(iout))
-                st.image(img_path, caption="WARNING: Please note the error in the legend. Top line should be $1 \\times 10^6$")
+                img_path = os.path.join("convergence_plots", "sink{:>03}".format(isink), "o{:>04}.png".format(iout))
+                st.image(data_url+img_path, caption="WARNING: Please note the error in the legend. Top line should be $1 \\times 10^6$")
 
             elif page in ["Column Density", "Temperature", "Images"]:
                 if st.session_state.image_viewtype == "Single Image":
@@ -201,77 +242,35 @@ with col2:
                     with img_col:
                         if page == "Column Density":
                             if st.session_state.viewpoint is not None:
-                                try:
-                                    st.image("./column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(view_keys[st.session_state.viewpoint]))
-                                except: 
-                                    st.error("Column density image not found for this snapshot and viewpoint.")
+                                show_coldens()
                         elif page == "Temperature":
                             if st.session_state.viewpoint is not None:
-                                try:
-                                    st.image("./temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(view_keys[st.session_state.viewpoint]))
-                                except:
-                                    st.error("Temperature image not found for this snapshot and viewpoint.")
+                                show_temp()
                         elif page == "Images":
                             if st.session_state.image_type == "Image generated by RADMC-3D":
-                                # Generate the name using the session state variable
-                                if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
-                                    img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                    st.session_state.moment.split()[-1],
-                                    st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                    view_keys[st.session_state.viewpoint]
-                                    )
-                                elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                    img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                    st.session_state.moment.split()[-1],
-                                    st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                    view_keys[st.session_state.viewpoint]
-                                    )
-                                try:
-                                    st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                except:
-                                    st.error("RADMC-3D image not found for this snapshot and viewpoint.")
-
+                                show_image(radmc=True)
                             elif st.session_state.image_type == "Image run through CASA simalma":
-                                # Generate the name using the session state variables
-                                if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
-                                    img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                    st.session_state.moment.split()[-1],
-                                    st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                    view_keys[st.session_state.viewpoint]
-                                    )
-                                elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                    img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                    st.session_state.moment.split()[-1],
-                                    st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                    view_keys[st.session_state.viewpoint]
-                                    )
-                                try:
-                                    st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                except:
-                                    st.error("CASA simalma image not found for this snapshot and viewpoint.")
+                                show_image(simalma=True)
+
                 elif st.session_state.image_viewtype == "Multi Image":
                     if page == "Column Density":
                         multiview_cols = st.columns(3)
-                        views = ["face-on", "edge-on-A", "edge-on-B"]
+                        views = ["Face On", "Edge On (A)", "Edge On (B)"]
 
                         for i, view_col in enumerate(multiview_cols):
                             with view_col:
-                                try:
-                                    st.image("./column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(views[i]))
-                                except: 
-                                    st.error("Column density image not found for this snapshot and viewpoint.")
-                                st.write(list(view_keys.keys())[list(view_keys.values()).index(views[i])])
+                                show_coldens(view=views[i])
+                                st.write(views[i])
+
                     elif page == "Temperature":
                         multiview_cols = st.columns(3)
-                        views = ["face-on", "edge-on-A", "edge-on-B"]
+                        views = ["Face On", "Edge On (A)", "Edge On (B)"]
 
                         for i, view_col in enumerate(multiview_cols):
                             with view_col:
-                                try:
-                                    st.image("./temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(views[i]))
-                                except: 
-                                    st.error("Temperature image not found for this snapshot and viewpoint.")
-                                st.write(list(view_keys.keys())[list(view_keys.values()).index(views[i])])
+                                show_temp(view=views[i])
+                                st.write(views[i])
+
                     elif page == "Images":
                         # Set up controls for doing multi-view 
                         main_col, optional_col = st.columns(2)
@@ -298,48 +297,17 @@ with col2:
                             if st.session_state.molecule is not None and st.session_state.moment is not None and st.session_state.image_type is not None:
                                 # Plot the different views
                                 img1, img2, img3 = st.columns(3)
-                                views = ["face-on", "edge-on-A", "edge-on-B"]
+                                views = ["Face On", "Edge On (A)", "Edge On (B)"]
 
                                 for i, img_col in enumerate([img1, img2, img3]):
                                     with img_col:
                                         if st.session_state.image_type == "Image generated by RADMC-3D":
-                                            # Generate the name using the session state variable
-                                            if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
-                                                img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                                st.session_state.moment.split()[-1],
-                                                st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                                views[i]
-                                                )
-                                            elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                                img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                                st.session_state.moment.split()[-1],
-                                                st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                                views[i]
-                                                )
-                                            try:
-                                                st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                            except:
-                                                st.error("RADMC-3D image not found for this snapshot and viewpoint.")
+                                            show_image(radmc=True, view=views[i])
 
                                         elif st.session_state.image_type == "Image run through CASA simalma":
-                                            # Generate the name using the session state variables
-                                            if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
-                                                img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                                st.session_state.moment.split()[-1],
-                                                st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                                views[i]
-                                                )
-                                            elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                                img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                                st.session_state.moment.split()[-1],
-                                                st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                                views[i]
-                                                )
-                                            try:
-                                                st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                            except:
-                                                st.error("CASA simalma image not found for this snapshot and viewpoint.")
-                                        st.write(list(view_keys.keys())[list(view_keys.values()).index(views[i])])
+                                            show_image(simalma=True, view=views[i])
+
+                                        st.write(views[i])
 
 
 
@@ -363,45 +331,10 @@ with col2:
                                 for i, img_col in enumerate([img1, img2, img3]):
                                     with img_col:
                                         if st.session_state.image_type == "Image generated by RADMC-3D":
-                                            # Generate the name using the session state variable
-                                            if molecules[i] == "$^{13}$CO J = 2-1" or molecules[i] == "C$^{18}$O J = 2-1":
-                                                img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                                st.session_state.moment.split()[-1],
-                                                molecules[i].replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                                view_keys[st.session_state.viewpoint]
-                                                )
-                                            elif molecules[i] == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                                img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                                st.session_state.moment.split()[-1],
-                                                molecules[i].replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                                view_keys[st.session_state.viewpoint]
-                                                )
-                                            try:
-                                                st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                            except:
-                                                st.error("RADMC-3D image not found for this snapshot and viewpoint.")
+                                            show_image(radmc=True, molecule=molecules[i])
 
                                         elif st.session_state.image_type == "Image run through CASA simalma":
-                                            # Generate the name using the session state variables
-                                            if molecules[i] == "$^{13}$CO J = 2-1" or molecules[i] == "C$^{18}$O J = 2-1":
-                                                img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                                st.session_state.moment.split()[-1],
-                                                molecules[i].replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                                view_keys[st.session_state.viewpoint]
-                                                )
-                                            elif molecules[i] == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                                img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                                st.session_state.moment.split()[-1],
-                                                molecules[i].replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                                view_keys[st.session_state.viewpoint]
-                                                )
-                                            try:
-                                                st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                            except:
-                                                st.error("CASA simalma image not found for this snapshot and viewpoint.")
-
-
-
+                                            show_image(simalma=True, molecule=molecules[i])
 
                         elif st.session_state.view_comparison == "Moment":
                             with optional_col:
@@ -426,43 +359,10 @@ with col2:
                                     for i, img_col in enumerate(cols):
                                         with img_col:
                                             if st.session_state.image_type == "Image generated by RADMC-3D":
-                                                # Generate the name using the session state variable
-                                                if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
-                                                    img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                                    st.session_state.multi_moments[i].split()[-1],
-                                                    st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                                    view_keys[st.session_state.viewpoint]
-                                                    )
-                                                elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                                    img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                                    st.session_state.multi_moments[i].split()[-1],
-                                                    st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                                    view_keys[st.session_state.viewpoint]
-                                                    )
-                                                try:
-                                                    st.image("./molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                                except:
-                                                    st.error("RADMC-3D image not found for this snapshot and viewpoint.")
+                                                show_image(radmc=True, moment=st.session_state.multi_moments[i].split()[-1])
 
                                             elif st.session_state.image_type == "Image run through CASA simalma":
-                                                # Generate the name using the session state variables
-                                                if st.session_state.molecule == "$^{13}$CO J = 2-1" or st.session_state.molecule == "C$^{18}$O J = 2-1":
-                                                    img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
-                                                    st.session_state.multi_moments[i].split()[-1],
-                                                    st.session_state.molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
-                                                    view_keys[st.session_state.viewpoint]
-                                                    )
-                                                elif st.session_state.molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
-                                                    img_name = "simalma_moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
-                                                    st.session_state.multi_moments[i].split()[-1],
-                                                    st.session_state.molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
-                                                    view_keys[st.session_state.viewpoint]
-                                                    )
-                                                try:
-                                                    st.image("./molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout)+img_name)
-                                                except:
-                                                    st.error("CASA simalma image not found for this snapshot and viewpoint.")
-
+                                                show_image(simalma=True, moment=st.session_state.multi_moments[i].split()[-1])
                             
             if iout in unconverged_sinkdict[str(isink)]:
                 st.warning("This snapshot's dust temperature distribution is unconverged.")

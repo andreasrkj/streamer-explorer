@@ -152,3 +152,5 @@ candidatenote_dir = {
             "Swoops in south in (A), slightly to the east in (B). Possibly northern spiral in face on?",
             "Long spiral east in face on, east in (A) but hidden in emission."]
 }
+
+data_url = "https://erda.dk/vgrid/streamer-explorer/"

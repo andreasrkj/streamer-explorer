@@ -2,7 +2,7 @@ import os
 import streamlit as st
 st.set_page_config(layout="wide")
 import numpy as np
-from _dictionaries import sink_dict, view_keys, mol_keys, candidate_dir, candidatenote_dir
+from _dictionaries import sink_dict, view_keys, mol_keys, candidate_dir, candidatenote_dir, data_url
 from collections import Counter
 
 st.title("Explore Streamer Candidates", anchor=False)
@@ -75,6 +75,7 @@ if st.session_state.selected_event is not None:
             st.session_state.candidate_viewpoint = candidate_viewpoint
         else:
             st.session_state.candidate_viewpoint = list(view_keys.keys())[list(view_keys.values()).index(event_views[0])]
+            st.write("**View:** "+st.session_state.candidate_viewpoint)
 
         if len(event_mols) > 1: # If more than one molecule available
             mol_options = [key for key, value in mol_keys.items() if value in event_mols]
@@ -82,6 +83,7 @@ if st.session_state.selected_event is not None:
             st.session_state.candidate_molecule = candidate_molecule
         else:
             st.session_state.candidate_molecule = list(mol_keys.keys())[list(mol_keys.values()).index(event_mols[0])]
+            st.write("**Molecule:** "+st.session_state.candidate_molecule)
 
     if st.session_state.candidate_viewpoint is not None and st.session_state.candidate_molecule is not None:
         # If we have the viewpoint and molecule, we can get the 
@@ -91,10 +93,10 @@ if st.session_state.selected_event is not None:
         imol = mol_keys[st.session_state.candidate_molecule][-4:]
 
         anim_name = "sc_s{:03d}_{:04d}_{:04d}_{}_{}".format(int(isink), nstart, nend, iview, imol)
-        output_path = "./candidate_animations/sink{:03d}/".format(int(isink))+anim_name+".mp4"
+        output_path = "candidate_animations/sink{:03d}/".format(int(isink))+anim_name+".mp4"
         
         # Add the video playback
-        st.video(output_path, loop=True, autoplay=True, muted=True)
+        st.video(data_url+output_path, loop=True, autoplay=True, muted=True)
 
         st.info("**Note attributed to this candidate:** "+candidate_note, icon=":material/note_stack:")
 

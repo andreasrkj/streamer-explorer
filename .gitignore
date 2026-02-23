@@ -4,6 +4,9 @@
 molecular_imgs/
 column_densities/
 temperatures/
+convergence_plots/
+candidate_animations/
+media_files.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
