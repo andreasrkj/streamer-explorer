@@ -37,6 +37,7 @@ def show_image(radmc=False, simalma=False, view=st.session_state.viewpoint, mole
         )
     try:
         st.image(img_path+img_name)
+        st.write(img_path+img_name)
     except:
         st.error(err_msg)
 
