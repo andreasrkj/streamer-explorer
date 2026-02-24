@@ -44,7 +44,7 @@ def show_temp(view=st.session_state.viewpoint):
     except:
         st.error("Temperature image not found for this snapshot and viewpoint.")
 
-title_col, option_col = st.columns(2)
+title_col, option_col = st.columns([1,2])
 with title_col:
     st.title("Explore Streamer Candidates", anchor=False)
 with option_col:
@@ -174,10 +174,13 @@ if st.session_state.selected_event is not None:
                                        moment=st.session_state.candidate_scrollable_choices[i])
 
     with col3:
-        # This column displays info that seems necessary to know when you get the video
-        message = "**Once viewpoint and molecule is selected, a video of the candidate will appear.**\n" \
-                  "The video below displays **one** snapshot per second.\n" \
-                  "The moments from left to right: 0, 1, 2, 8 and 9.\n" \
-                  "The video automatically loops when it reaches the final snapshot.\n"
+        if st.session_state.candidate_viewoption == "As Video":
+            # This column displays info that seems necessary to know when you get the video
+            message = "**Once viewpoint and molecule is selected, a video of the candidate will appear.**\n" \
+                    "The video below displays **one** snapshot per second.\n" \
+                    "The moments from left to right: 0, 1, 2, 8 and 9.\n" \
+                    "The video automatically loops when it reaches the final snapshot.\n"
 
-        st.info(message, icon=":material/info:")
+            st.info(message, icon=":material/info:")
+        elif st.session_state.candidate_viewoption == "As Scrollable Images":
+            st.info("**Note attributed to this candidate:** "+candidate_note, icon=":material/note_stack:")
