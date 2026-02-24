@@ -35,7 +35,7 @@ def basic_stats(sink_id):
     st.markdown(f"**Calculation Time (CPU hrs):** {np.round(total_calculation_time[str(sink_id)],2)}")
     st.markdown(f"**Snapshot Range:** {snap_min} - {snap_max}")
     st.markdown(f"**Total Snapshots:** {total_snaps}")
-    st.markdown(f"**Streamer Candidates Identified: {len(candidate_dir[int(sink_id)])}")
+    st.markdown(f"**Streamer Candidates Identified:** {len(candidate_dir[int(sink_id)])}")
 
 def _format_missing_range(missing_list, snapshots):
     """Format missing file list as a string or range."""
