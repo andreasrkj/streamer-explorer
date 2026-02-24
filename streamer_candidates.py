@@ -4,8 +4,14 @@ st.set_page_config(layout="wide")
 import numpy as np
 from _dictionaries import sink_dict, view_keys, mol_keys, candidate_dir, candidatenote_dir, data_url
 from collections import Counter
+from streamer_data import show_image, show_coldens, show_temp
 
-st.title("Explore Streamer Candidates", anchor=False)
+title_col, option_col = st.columns(2)
+with title_col:
+    st.title("Explore Streamer Candidates", anchor=False)
+with option_col:
+    candidate_viewoption = st.pills("Select how to view the candidates", ["As Video", "As Scrollable Images"], selection_mode="single", default=st.session_state.candidate_viewoption)
+    st.session_state.candidate_viewoption = candidate_viewoption
 
 # Create columns (one for selection, another for the data itself)
 col1, col2, col3 = st.columns(3)
@@ -86,19 +92,47 @@ if st.session_state.selected_event is not None:
             st.write("**Molecule:** "+st.session_state.candidate_molecule)
 
     if st.session_state.candidate_viewpoint is not None and st.session_state.candidate_molecule is not None:
-        # If we have the viewpoint and molecule, we can get the 
-
         # Get molecule name as [-4:] to get "ph2co" -> "h2co"
         iview = view_keys[st.session_state.candidate_viewpoint]
         imol = mol_keys[st.session_state.candidate_molecule][-4:]
 
-        anim_name = "sc_s{:03d}_{:04d}_{:04d}_{}_{}".format(int(isink), nstart, nend, iview, imol)
-        output_path = "candidate_animations/sink{:03d}/".format(int(isink))+anim_name+".mp4"
-        
-        # Add the video playback
-        st.video(data_url+output_path, loop=True, autoplay=True, muted=True)
+        # Check if we want to view as video
+        if st.session_state.candidate_viewoption == "As Video":
+            anim_name = "sc_s{:03d}_{:04d}_{:04d}_{}_{}".format(int(isink), nstart, nend, iview, imol)
+            output_path = "candidate_animations/sink{:03d}/".format(int(isink))+anim_name+".mp4"
+            
+            # Add the video playback
+            st.video(data_url+output_path, loop=True, autoplay=True, muted=True)
 
-        st.info("**Note attributed to this candidate:** "+candidate_note, icon=":material/note_stack:")
+            st.info("**Note attributed to this candidate:** "+candidate_note, icon=":material/note_stack:")
+
+        elif st.session_state.candidate_viewoption == "As Scrollable Images":
+            # Just print all the images at this point
+            choice_col, slider_col = st.columns(2)
+            with choice_col:
+                scrollable_choices = st.pills("Choose which images to view", ["Column Density", "Temperature", "Moment 0", "Moment 1", "Moment 2", "Moment 8", "Moment 9"], 
+                                            selection_mode="multi", default=st.session_state.candidate_scrollable_choices)
+                st.session_state.candidate_scrollable_choices = scrollable_choices
+            with slider_col:
+                istart, iend = st.select_slider("Select snapshot range to display", options=np.arange(nstart, nend+1, 10), value=(nstart, nend))
+
+            for iout in np.arange(istart, iend+1, 10):
+                st.markdown(f"**Snapshot {iout}**", text_alignment="center")
+                img_cols = st.columns(len(st.session_state.candidate_scrollable_choices))
+
+                for i, icol in enumerate(img_cols):
+                    with icol:
+                        if st.session_state.candidate_scrollable_choices[i] == "Column Density":
+                            if iout == istart: st.write("Column Density")
+                            show_coldens(view=st.session_state.candidate_viewpoint)
+                        elif st.session_state.candidate_scrollable_choices[i] == "Temperature":
+                            if iout == istart: st.write("Temperature")
+                            show_temp(view=st.session_state.candidate_viewpoint)
+                        elif "Moment" in st.session_state.candidate_scrollable_choices[i]:
+                            if iout == istart: st.write(st.session_state.candidate_scrollable_choices[i])
+                            show_image(simalma=True, view=st.session_state.candidate_viewpoint, 
+                                       molecule=st.session_state.candidate_molecule, 
+                                       moment=st.session_state.candidate_scrollable_choices[i])
 
     with col3:
         # This column displays info that seems necessary to know when you get the video

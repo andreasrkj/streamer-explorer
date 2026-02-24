@@ -31,6 +31,10 @@ if "candidate_viewpoint" not in st.session_state:
     st.session_state.candidate_viewpoint = None
 if "candidate_molecule" not in st.session_state:
     st.session_state.candidate_molecule = None
+if "candidate_viewoption" not in st.session_state:
+    st.session_state.candidate_viewoption = "As Video"
+if "candidate_scrollable_choices" not in st.session_state:
+    st.session_state.candidate_scrollable_choices = ["Moment 0", "Moment 1", "Moment 2", "Moment 8", "Moment 9"]
 
 data_page   = st.Page("streamer_data.py", title="Data Explorer", icon=":material/search:")
 events_page = st.Page("streamer_candidates.py", title="Streamer Candidates", icon=":material/airwave:")
