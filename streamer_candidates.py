@@ -76,6 +76,7 @@ with col1:
     if isink != st.session_state.current_sink:
         st.session_state.current_sink = isink
         st.session_state.selected_event = None
+        st.session_state.selected_point = None
 
     if isink is not None:
         # Format the event list

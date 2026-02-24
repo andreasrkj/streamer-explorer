@@ -78,6 +78,7 @@ with col1:
     if isink != st.session_state.current_sink:
         st.session_state.current_sink = isink
         st.session_state.selected_point = None
+        st.session_state.selected_event = None
 
     if isink is not None:
         (nstart, nend) = sink_dict[str(isink)]
