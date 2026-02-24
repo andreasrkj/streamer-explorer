@@ -4,7 +4,45 @@ st.set_page_config(layout="wide")
 import numpy as np
 from _dictionaries import sink_dict, view_keys, mol_keys, candidate_dir, candidatenote_dir, data_url
 from collections import Counter
-from streamer_data import show_image, show_coldens, show_temp
+
+# FUNCTION DEFINITIONS
+def show_image(radmc=False, simalma=False, view=st.session_state.viewpoint, molecule=st.session_state.molecule, moment=st.session_state.moment):
+    if simalma:
+        img_path = data_url+"molecular_imgs/casa/sink{:>03}/nout{:>04}/".format(isink, iout) + "simalma_"
+        err_msg  = "CASA simalma image not found for this snapshot and viewpoint."
+    elif radmc:
+        img_path = data_url+"molecular_imgs/radmc/sink{:>03}/nout{:>04}/".format(isink, iout)
+        err_msg  = "RADMC-3D image not found for this snapshot and viewpoint."
+
+    # Generate the name using the session state variables
+    if molecule == "$^{13}$CO J = 2-1" or molecule == "C$^{18}$O J = 2-1":
+        img_name = "moment-{}-map-{}-{}-npix400-5000au-transition2-widthkms8-lines201.png".format(
+        moment.split()[-1],
+        molecule.replace("$^{13}$CO J = 2-1", "13co").replace("C$^{18}$O J = 2-1", "c18o"),
+        view_keys[view]
+        )
+    elif molecule == "H$_2$CO J = 3$_{0,3}$-2$_{0,2}$":
+        img_name = "moment-{}-map-{}-{}-npix400-5000au-transition3-widthkms8-lines201.png".format(
+        moment.split()[-1],
+        molecule.replace("H$_2$CO J = 3$_{0,3}$-2$_{0,2}$", "ph2co"),
+        view_keys[view]
+        )
+    try:
+        st.image(img_path+img_name)
+    except:
+        st.error(err_msg)
+
+def show_coldens(view=st.session_state.viewpoint):
+    try:
+        st.image(data_url+"column_densities/sink{:>03}/nout{:>04}/".format(isink, iout)+"coldens-{}-res1000-width5000-dz5000.png".format(view_keys[view]))
+    except: 
+        st.error("Column density image not found for this snapshot and viewpoint.")
+
+def show_temp(view=st.session_state.viewpoint):
+    try:
+        st.image(data_url+"temperatures/sink{:>03}/nout{:>04}/".format(isink, iout)+"temperature-{}-res1000-width5000-dz5000.png".format(view_keys[view]))
+    except:
+        st.error("Temperature image not found for this snapshot and viewpoint.")
 
 title_col, option_col = st.columns(2)
 with title_col:
