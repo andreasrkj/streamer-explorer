@@ -4,7 +4,7 @@ st.set_page_config(layout="wide")
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from _dictionaries import sink_dict, unconverged_sinkdict, total_calculation_time
+from _dictionaries import sink_dict, unconverged_sinkdict, total_calculation_time, candidate_dir
 
 def _get_missing_files(sink_id, folder="./temperatures/"):
     # Now check whether any images are missing in the folder
@@ -35,6 +35,7 @@ def basic_stats(sink_id):
     st.markdown(f"**Calculation Time (CPU hrs):** {np.round(total_calculation_time[str(sink_id)],2)}")
     st.markdown(f"**Snapshot Range:** {snap_min} - {snap_max}")
     st.markdown(f"**Total Snapshots:** {total_snaps}")
+    st.markdown(f"**Streamer Candidates Identified: {len(candidate_dir[int(sink_id)])}")
 
 def _format_missing_range(missing_list, snapshots):
     """Format missing file list as a string or range."""
