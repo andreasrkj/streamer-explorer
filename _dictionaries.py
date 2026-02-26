@@ -100,6 +100,7 @@ candidate_dir = {
             (750, 920, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
             (980, 1310, ["face-on", "edge-on-A"], ["ph2co", "c18o"]),
             (1110, 1260, ["edge-on-A", "edge-on-B"], ["ph2co", "13co", "c18o"]),
+            (1230, 1310, ["face-on", "edge-on-A", "edge-on-B"], ["c18o"]),
             (1250, 1310, ["face-on", "edge-on-A"], ["c18o"])]
 }
 
@@ -158,5 +159,6 @@ candidatenote_dir = {
             "Southwest in face on, West in (B). Possibly East in (A)?  Flips 910->920",
             "Almost east in face on (upper of the clump), lower east in (A). Also strong signal in C18O",
             "Swoops in south in (A), slightly to the east in (B). Northern spiral in face on",
+            "S of the disk in face on. Swoops from N down on the right side clockwise in (A), from SW in (B)",
             "Long spiral east in face on, east in (A) but hidden in emission."]
 }
