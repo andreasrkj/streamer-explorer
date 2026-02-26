@@ -73,7 +73,7 @@ candidate_dir = {
            (330, 500, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
            (540, 710, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
            (800, 1130, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
-           (810, 870, ["face-on", "edge-on-B"], ["h2co"])],
+           (810, 870, ["face-on", "edge-on-B"], ["ph2co"])],
 
       122: [(370, 490, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
             (370, 600, ["face-on", "edge-on-A"], ["ph2co", "c18o"]),
