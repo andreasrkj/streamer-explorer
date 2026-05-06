@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 from _dictionaries import sink_dict, view_keys, unconverged_sinkdict, data_url
-from streamlit_app import add_footer
 
 st.title("Explore the dataset", anchor=False)
 
@@ -368,6 +367,3 @@ with col2:
                             
             if iout in unconverged_sinkdict[str(isink)]:
                 st.warning("This snapshot's dust temperature distribution is unconverged.")
-
-# Add the footer
-add_footer()

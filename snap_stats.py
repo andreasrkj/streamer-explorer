@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 from _dictionaries import sink_dict, unconverged_sinkdict, total_calculation_time, candidate_dir
-from streamlit_app import add_footer
 
 def _get_missing_files(sink_id, folder="./temperatures/"):
     # Now check whether any images are missing in the folder
@@ -207,6 +206,3 @@ if selected_sinks != []:
                 convergence(sink_id)
                 if icol == sink_cols[0]:
                     st.warning("**Note:** Red segments indicate unconverged snapshots.")
-
-# Add the footer
-add_footer()

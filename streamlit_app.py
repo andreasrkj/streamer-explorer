@@ -42,24 +42,3 @@ stats_page  = st.Page("snap_stats.py", title="Snapshot Statistics", icon=":mater
 
 pg = st.navigation([data_page, events_page, stats_page], position="top")
 pg.run()
-
-def add_footer():
-    footer = """
-    <style>
-    .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: white;
-        color: black;
-        text-align: center;
-        padding: 10px;
-        z-index: 9999;
-    }
-    </style>
-    <div class="footer">
-        <p>📝 Part of a MSc Project by Andreas Rasmussen Kjær - Niels Bohr Institute, University of Copenhagen</p>
-    </div>
-    """
-    st.markdown(footer, unsafe_allow_html=True)
