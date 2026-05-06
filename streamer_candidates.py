@@ -3,6 +3,7 @@ import streamlit as st
 st.set_page_config(layout="wide")
 import numpy as np
 from _dictionaries import sink_dict, view_keys, mol_keys, candidate_dir, candidatenote_dir, data_url
+from streamlit_app import add_footer
 from collections import Counter
 
 # FUNCTION DEFINITIONS
@@ -184,3 +185,6 @@ if st.session_state.selected_event is not None:
             st.info(message, icon=":material/info:")
         elif st.session_state.candidate_viewoption == "As Scrollable Images":
             st.info("**Note attributed to this candidate:** "+candidate_note, icon=":material/note_stack:")
+
+# Add the footer
+add_footer()
