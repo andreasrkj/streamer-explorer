@@ -64,8 +64,6 @@ candidate_dir = {
       24 : [(240, 490, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "13co", "c18o"]),
             (240, 500, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "13co", "c18o"]),
             (560, 640, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
-            (810, 970, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "13co", "c18o"]),
-            (810, 1110, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
             (1050, 1150, ["face-on", "edge-on-B"], ["ph2co", "c18o"]),
             (1220, 1340, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"])],
 
@@ -80,10 +78,7 @@ candidate_dir = {
             (700, 1100, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
             (700, 1100, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"])],
 
-      162: [(460, 500, ["face-on", "edge-on-B"], ["ph2co", "c18o"]),
-            (480, 500, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
-            (540, 950, ["face-on", "edge-on-B"], ["ph2co", "c18o"]),
-            (540, 720, ["face-on", "edge-on-B"], ["ph2co", "c18o"]),
+      162: [(540, 950, ["face-on", "edge-on-B"], ["ph2co", "c18o"]),
             (1030, 1120, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
             (1200, 1450, ["face-on", "edge-on-B"], ["ph2co", "c18o"]),
             (1200, 1450, ["face-on", "edge-on-B"], ["ph2co", "c18o"]),
@@ -92,16 +87,14 @@ candidate_dir = {
             (1960, 2040, ["face-on", "edge-on-B"], ["ph2co", "c18o"])],
       
       180: [(460, 550, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co"]),
-            (720, 1490, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
-            (1280, 1520, ["face-on", "edge-on-A"], ["ph2co", "c18o"])],
+            (720, 1490, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"])],
 
       225: [(600, 950, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
             (610, 690, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
             (750, 920, ["face-on", "edge-on-A", "edge-on-B"], ["ph2co", "c18o"]),
             (980, 1310, ["face-on", "edge-on-A"], ["ph2co", "c18o"]),
             (1110, 1260, ["edge-on-A", "edge-on-B"], ["ph2co", "13co", "c18o"]),
-            (1230, 1310, ["face-on", "edge-on-A", "edge-on-B"], ["c18o"]),
-            (1250, 1310, ["face-on", "edge-on-A"], ["c18o"])]
+            (1230, 1310, ["face-on", "edge-on-A", "edge-on-B"], ["c18o"])]
 }
 
 candidatenote_dir = {
@@ -123,8 +116,6 @@ candidatenote_dir = {
       24 : ["Southwestern spiral in face on, seen west in (A) and (B)",
             "Northeastern spiral face on, seen in east in both (A) and (B)",
             "Northeastern spiral in face on, east in (A) and west in (B)",
-            "Southern thing in face on, seen west in (B). Moves slightly north to south, not a strong gradient",
-            "Northern in face on, related to E in (A) and (B). Turns 90 degrees over time and collimates",
             "Long strand thing in NE of (B), slightly visible north in face on",
             "Eastern thing in face on, moves slightly north, visible in NE part of (A) and NW of (B)"],
 
@@ -139,10 +130,7 @@ candidatenote_dir = {
             "Northeast in face on, east in (A), east in (B). Rotates towards N and disappears from (A)",
             "Not that visible in face on, but shows up eventually SW. Strong in west (B) and also in (A) east"],
 
-      162: ["Northern spiral in face on. Seen east in (B)",
-            "Southern spiral in face on. Seen west in (A) and west in (B)",
-            "North in face on, east in (B). Turns NW in face on. Shows up in (A) but tangled with below",
-            "South in face on, west in (B). Turns SW in face on, shows up in (A) but tangled with above",
+      162: ["North in face on, east in (B). Turns NW in face on. Shows up in (A) but tangled with below",
             "North in face on. Flips 180 degrees 1060->1070. Moves W->E in (A). Also shows up E in (B)",
             "North in face on. East in (B). Disappears a bit in the surrounding emission sometimes",
             "South in face on. West in (B). Same as above, disappears and gradient sometimes not strong",
@@ -151,14 +139,12 @@ candidatenote_dir = {
             "North in face on. East in (B). Best in C18O"],
       
       180: ["W in both face on and (A). Extends slightly NW, so also seen slightly E in (B), but tangled in bg.",
-            "Periodically visible in face on NE, otherwise (A) direct S and (B) in SE. Best in C18O. Flips a lot",
-            "Flips 180 degrees a couple times. Starts in SE of face on, SE of (A). Maybe merges with above?"],
+            "Periodically visible in face on NE, otherwise (A) direct S and (B) in SE. Best in C18O. Flips a lot"],
 
       225: ["NE in face on, SE in (A) and (B). Flips straight south. Flips 910->920",
             "SE in face on, SSW/S in (A) and E in (B). Flips straight north",
             "Southwest in face on, West in (B). Possibly East in (A)?  Flips 910->920",
             "Almost east in face on (upper of the clump), lower east in (A). Also strong signal in C18O",
             "Swoops in south in (A), slightly to the east in (B). Northern spiral in face on",
-            "S of the disk in face on. Swoops from N down on the right side clockwise in (A), from SW in (B)",
-            "Long spiral east in face on, east in (A) but hidden in emission."]
+            "S of the disk in face on. Swoops from N down on the right side clockwise in (A), from SW in (B)"]
 }
